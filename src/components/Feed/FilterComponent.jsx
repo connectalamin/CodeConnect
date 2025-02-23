@@ -1,6 +1,6 @@
-import { Card, Text, Stack, Select,Button } from '@mantine/core';
+import { Card, Text, Stack, Select, Button } from '@mantine/core';
 
-const FilterComponent = () => {
+const FilterComponent = ({ selectedDateRange, setSelectedDateRange, selectedCategory, setSelectedCategory, selectedSort, setSelectedSort }) => {
   return (
     <Card
       shadow="lg"
@@ -21,9 +21,11 @@ const FilterComponent = () => {
           <Select
             label={<Text size="sm" weight={500} color="gray-700">Date</Text>}
             placeholder="Select date range"
-            data={['Last 7 days', 'Last 30 days', 'All time']}
+            data={['Last 24 Hours', 'Last 7 days', 'Last 30 days', 'All time']}
             radius="md"
             className="w-full"
+            value={selectedDateRange}
+            onChange={setSelectedDateRange}
             styles={{
               input: {
                 backgroundColor: 'rgba(240, 249, 235, 0.5)',
@@ -39,9 +41,11 @@ const FilterComponent = () => {
           <Select
             label={<Text size="sm" weight={500} color="gray-700">Category</Text>}
             placeholder="Select category"
-            data={['Technology', 'Education', 'Health', 'Other']}
+            data={['Technology', 'Education', 'Health', 'Other', 'GENERAL']}
             radius="md"
             className="w-full"
+            value={selectedCategory}
+            onChange={setSelectedCategory}
             styles={{
               input: {
                 backgroundColor: 'rgba(240, 249, 235, 0.5)',
@@ -61,14 +65,16 @@ const FilterComponent = () => {
             <Button
               variant="subtle"
               radius="md"
-              className="text-gray-700 hover:bg-[#94d2bd]/20 hover:text-[#94d2bd] transition-all duration-200"
+              className={`text-gray-700 hover:bg-[#94d2bd]/20 hover:text-[#94d2bd] transition-all duration-200 ${selectedSort === 'Top' ? 'bg-[#94d2bd]/20 text-[#94d2bd]' : ''}`}
+              onClick={() => setSelectedSort('Top')}
             >
               Top
             </Button>
             <Button
               variant="subtle"
               radius="md"
-              className="text-gray-700 hover:bg-[#94d2bd]/20 hover:text-[#94d2bd] transition-all duration-200"
+              className={`text-gray-700 hover:bg-[#94d2bd]/20 hover:text-[#94d2bd] transition-all duration-200 ${selectedSort === 'Recent' ? 'bg-[#94d2bd]/20 text-[#94d2bd]' : ''}`}
+              onClick={() => setSelectedSort('Recent')}
             >
               Recent
             </Button>

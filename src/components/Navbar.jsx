@@ -2,7 +2,7 @@ import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import { TbLogout2 } from "react-icons/tb";
 import { CiMenuFries } from "react-icons/ci";
 import { MdOutlineKeyboardArrowRight } from "react-icons/md";
-
+import { Group } from "@mantine/core";
 import { AiOutlineFire } from "react-icons/ai";
 import { IoInformationCircleOutline } from "react-icons/io5";
 import { FiUser } from "react-icons/fi";
@@ -34,12 +34,16 @@ const Navbar = () => {
   return (
     <nav className="flex items-center justify-between w-full relative px-4 max-w-[1440px] mx-auto">
       {/* Logo */}
-      <img
+      <Group
+      >
+ <img
         src={Logo}
         alt="CodeConnect Logo"
         className="w-[55px] object-contain transform rotate-45" // Rotated logo, matching your branding
       />
-
+      <h1 className="text-[1.5rem] font-bold text-[#7ed957]">CodeConnect</h1>
+      </Group>
+     
       {/* Nav Links (Desktop) */}
       <ul className="items-center gap-[20px] text-[1rem] text-[#424242] md:flex hidden">
         {/* Product Mega Menu */}

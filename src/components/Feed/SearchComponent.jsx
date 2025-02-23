@@ -1,12 +1,14 @@
 import { TextInput } from '@mantine/core';
 
-const SearchComponent = () => {
+const SearchComponent = ({ searchTerm, setSearchTerm }) => {
   return (
     <TextInput
       placeholder="Search posts by title or category..."
       radius="lg"
       className="w-full"
       icon={<span className="text-[#94d2bd]">🔍</span>}
+      value={searchTerm}
+      onChange={(e) => setSearchTerm(e.target.value)}
       styles={{
         input: {
           backgroundColor: '#ffffff',

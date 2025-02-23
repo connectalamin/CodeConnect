@@ -1,5 +1,5 @@
 import Navbar from '../components/Navbar';
-import { Container, Grid, Stack, Text, Button, Card, Group } from '@mantine/core';
+import { Container, Grid, Stack, Text, Button, Card, Group, Tabs} from '@mantine/core'; // Added Anchor
 import { useState } from 'react';
 import { useProfile } from '../hooks/useProfile';
 import { usePost } from '../hooks/usePost';
@@ -8,15 +8,90 @@ import PostComponent from '../components/Feed/PostComponent';
 import FilterComponent from '../components/Feed/FilterComponent';
 import AddPostComponent from '../components/Feed/AddPostComponent';
 import { FaStar } from 'react-icons/fa';
+import HashLoader from 'react-spinners/HashLoader';
+import toast from 'react-hot-toast';
+import { Link } from 'react-router-dom'; // For navigation
+
 
 const FeedPage = () => {
   const { profile } = useProfile();
-  const { posts, isLoading, isError, error } = usePost(); // Fetch posts using usePost hook
+  const { posts, isLoading, isError, error, fetchNextPage, hasNextPage } = usePost();
   const [opened, setOpened] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedDateRange, setSelectedDateRange] = useState('All time');
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [selectedSort, setSelectedSort] = useState('Recent');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [visiblePosts, setVisiblePosts] = useState(5); // Initial 5 posts
+  const [visibleComments, setVisibleComments] = useState(5); // Initial 5 comments
+  const postsPerPage = 3;
 
+  if (isLoading) return <HashLoader color="#7ec226" loading speedMultiplier={2} />;
+  if (isError) return toast.error(error);
 
-  if (isLoading) return <div className="flex justify-center items-center h-screen">Loading...</div>;
-  if (isError) return <div className="flex justify-center items-center h-screen text-red-500">Error: {error}</div>;
+  const filterPostsByDate = (posts) => {
+    const now = new Date();
+    return posts.filter((post) => {
+      const postDate = new Date(post.createdAt);
+      switch (selectedDateRange) {
+        case 'Last 24 Hours':
+          return now - postDate <= 24 * 60 * 60 * 1000;
+        case 'Last 7 days':
+          return now - postDate <= 7 * 24 * 60 * 60 * 1000;
+        case 'Last 30 days':
+          return now - postDate <= 30 * 24 * 60 * 1000;
+        case 'All time':
+        default:
+          return true;
+      }
+    });
+  };
+
+  const filteredPosts = filterPostsByDate(posts).filter((post) =>
+    (post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      post.category?.toLowerCase().includes(searchTerm.toLowerCase())) &&
+    (selectedCategory ? post.category?.toLowerCase() === selectedCategory.toLowerCase() : true)
+  );
+
+  const sortedPosts = filteredPosts.sort((a, b) => {
+    if (selectedSort === 'Top') {
+      return b.upvotes - a.upvotes;
+    } else {
+      return new Date(b.createdAt) - new Date(a.createdAt);
+    }
+  });
+
+  const indexOfLastPost = currentPage * postsPerPage;
+  const indexOfFirstPost = indexOfLastPost - postsPerPage;
+  const currentPosts = sortedPosts.slice(indexOfFirstPost, indexOfLastPost);
+
+  const totalPages = Math.ceil(sortedPosts.length / postsPerPage);
+
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  // Filter user's posts and comments
+  const myPosts = posts.filter((post) => post.userId === profile?.user?.id);
+  const myComments = posts
+    .flatMap((post) => post.comments || [])
+    .filter((comment) => comment.userId === profile?.user?.id);
+
+  const handleShowMorePosts = () => {
+    setVisiblePosts(myPosts.length); // Show all posts
+  };
+
+  const handleShowMoreComments = () => {
+    setVisibleComments(myComments.length); // Show all comments
+  };
 
   return (
     <>
@@ -36,7 +111,7 @@ const FeedPage = () => {
             </Button>
           </div>
 
-          <SearchComponent />
+          <SearchComponent searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
 
           <Grid gutter="lg">
             <Grid.Col span={3}>
@@ -70,18 +145,11 @@ const FeedPage = () => {
                         size="lg"
                         weight={700}
                         className="text-gray-900 truncate max-w-full bg-gray-100/50 px-3 py-1 rounded-full"
-                        style={{ lineHeight: '1.2' }}
                       >
                         {profile?.user?.name || 'Unnamed User'}
                       </Text>
-                      <Text
-                        size="sm"
-                        weight={400}
-                        color="gray-600"
-                        className="flex items-center gap-1"
-                        style={{ lineHeight: '1.4' }}
-                      >
-                        <span className="text-[#eeea1a]">📅</span>
+                      <Text size="sm" weight={400} color="gray-600" className="flex items-center gap-1">
+                        <span className="text-[#94d2bd]">📅</span>
                         Batch: {profile?.user?.batch || 'N/A'}
                       </Text>
                     </Stack>
@@ -90,51 +158,25 @@ const FeedPage = () => {
                       weight={400}
                       color="gray-600"
                       className="italic bg-gradient-to-r from-[#94d2bd]/10 to-transparent px-2 rounded-md"
-                      style={{ lineHeight: '1.4' }}
                     >
                       {profile?.user?.occupation || 'Not Specified'}
                     </Text>
-                    <Text
-                      size="sm"
-                      weight={500}
-                      color="gray-700"
-                      className="flex items-center gap-1"
-                      style={{ lineHeight: '1.5' }}
-                    >
+                    <Text size="sm" weight={500} color="gray-700" className="flex items-center gap-1">
                       <span className="text-[#94d2bd]">🏫</span>
                       {profile?.user?.university || 'Unknown University'}
                     </Text>
-                    <Text
-                      size="xs"
-                      weight={400}
-                      color="gray-600"
-                      className="flex items-center gap-1"
-                      style={{ lineHeight: '1.5' }}
-                    >
+                    <Text size="xs" weight={400} color="gray-600" className="flex items-center gap-1">
                       <span className="text-[#94d2bd]">🕒</span>
                       Session: {profile?.user?.session || 'N/A'}
                     </Text>
-                    <Text
-                      size="xs"
-                      weight={500}
-                      color="gray-700"
-                      className="flex items-center gap-1 bg-gray-100/50 px-2 py-1 rounded-md"
-                      style={{ lineHeight: '1.5' }}
-                    >
+                    <Text size="xs" weight={500} color="gray-700" className="flex items-center gap-1 bg-gray-100/50 px-2 py-1 rounded-md">
                       <span className="text-[#94d2bd]">🏆</span>
                       Ranking: {profile?.user?.ranking || 'Unranked'}
                     </Text>
-                    <Text
-                      size="xs"
-                      weight={500}
-                      color="gray-700"
-                      className="flex items-center gap-1 bg-gray-100/50 px-2 py-1 rounded-md"
-                      style={{ lineHeight: '1.5' }}
-                    >
-                       <FaStar className="text-[#c21212]" />
+                    <Text size="xs" weight={500} color="gray-700" className="flex items-center gap-1 bg-gray-100/50 px-2 py-1 rounded-md">
+                      <FaStar className="text-yellow-500" />
                       Karma Points: {profile?.user?.karmaPoints || '0'}
                     </Text>
-                   
                   </Stack>
                 </div>
               </Card>
@@ -143,8 +185,8 @@ const FeedPage = () => {
             <Grid.Col span={6}>
               <div className="space-y-6">
                 <div className="space-y-4">
-                  {posts.length > 0 ? (
-                    posts.map((post) => <PostComponent key={post.id} post={post} />)
+                  {currentPosts.length > 0 ? (
+                    currentPosts.map((post) => <PostComponent key={post.id} post={post} />)
                   ) : (
                     <Text size="md" color="gray-600" className="text-center">
                       No posts available.
@@ -157,16 +199,20 @@ const FeedPage = () => {
                       variant="subtle"
                       radius="md"
                       className="text-gray-400 bg-gray-100 cursor-not-allowed opacity-60 hover:bg-gray-100 hover:text-gray-400"
+                      onClick={handlePreviousPage}
+                      disabled={currentPage === 1}
                     >
                       Previous
                     </Button>
                     <Text size="sm" weight={500} color="gray-700" className="px-3 py-1">
-                      1 of 5
+                      Page {currentPage} of {totalPages}
                     </Text>
                     <Button
                       variant="subtle"
                       radius="md"
                       className="text-gray-600 hover:bg-[#94d2bd]/20 hover:text-[#94d2bd] transition-all duration-200"
+                      onClick={handleNextPage}
+                      disabled={currentPage === totalPages}
                     >
                       Next
                     </Button>
@@ -176,7 +222,91 @@ const FeedPage = () => {
             </Grid.Col>
 
             <Grid.Col span={3}>
-              <FilterComponent />
+              <Stack spacing="lg">
+                <FilterComponent
+                  selectedDateRange={selectedDateRange}
+                  setSelectedDateRange={setSelectedDateRange}
+                  selectedCategory={selectedCategory}
+                  setSelectedCategory={setSelectedCategory}
+                  selectedSort={selectedSort}
+                  setSelectedSort={setSelectedSort}
+                />
+
+                <Card
+                  shadow="md"
+                  radius="xl"
+                  className="p-4 bg-gradient-to-b from-white to-gray-50 border border-gray-200"
+                >
+                  <Tabs defaultValue="posts" variant="pills" color="gray">
+                    <Tabs.List>
+                      <Tabs.Tab value="posts">My Posts</Tabs.Tab>
+                      <Tabs.Tab value="comments">My Comments</Tabs.Tab>
+                    </Tabs.List>
+
+                    <Tabs.Panel value="posts" pt="xs">
+                      <Stack spacing="sm" className="max-h-60 overflow-y-auto">
+                        {myPosts.slice(0, visiblePosts).map((post) => (
+                          <div key={post.id} className="p-2 bg-gray-100 rounded-md">
+                            <Text size="sm" weight={600} className="line-clamp-1">
+                              {post.title}
+                            </Text>
+                            <Text size="xs" color="gray-600" className="line-clamp-1">
+                              {new Date(post.createdAt).toLocaleDateString()}
+                            </Text>
+                          </div>
+                        ))}
+                        {myPosts.length > 3 && (
+                          visiblePosts <= 3 ? (
+                            <Button
+                              variant="outline"
+                              size="xs"
+                              onClick={handleShowMorePosts}
+                              className="mt-2"
+                            >
+                              Show More
+                            </Button>
+                          ) : (
+                            <Link component={Link} to="/my-posts" size="xs" className="mt-2 text-[#0a3f1e]">
+                              Go to My Posts
+                            </Link>
+                          )
+                        )}
+                      </Stack>
+                    </Tabs.Panel>
+
+                    <Tabs.Panel value="comments" pt="xs">
+                      <Stack spacing="sm" className="max-h-60 overflow-y-auto">
+                        {myComments.slice(0, visibleComments).map((comment, index) => (
+                          <div key={index} className="p-2 bg-gray-100 rounded-md">
+                            <Text size="sm" className="line-clamp-2">
+                              {comment.content}
+                            </Text>
+                            <Text size="xs" color="gray-600" className="line-clamp-1">
+                              {new Date(comment.createdAt).toLocaleDateString()}
+                            </Text>
+                          </div>
+                        ))}
+                        {myComments.length > 3 && (
+                          visibleComments <= 3 ? (
+                            <Button
+                              variant="outline"
+                              size="xs"
+                              onClick={handleShowMoreComments}
+                              className="mt-2"
+                            >
+                              Show More
+                            </Button>
+                          ) : (
+                            <Link component={Link} to="/my-comments" size="xs" className="mt-2 text-[#073324]">
+                              Go to My Comments
+                            </Link>
+                          )
+                        )}
+                      </Stack>
+                    </Tabs.Panel>
+                  </Tabs>
+                </Card>
+              </Stack>
             </Grid.Col>
           </Grid>
 

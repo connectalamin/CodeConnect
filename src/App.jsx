@@ -13,7 +13,8 @@ import PublicRoute from "./components/PublicRoute";
 import { Toaster } from "react-hot-toast";
 import UpdateProfile from "./pages/UpdateProfile";
 import Feed from "./pages/Feed";
-
+import MyPostsPage from "./pages/MyPostsPage";
+import MyCommentsPage from "./pages/MyCommentsPage";
 function App() {
   return (
     <AuthProvider>
@@ -83,6 +84,22 @@ function App() {
             element={
               <ProtectedRoute>
                 <Feed />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/my-posts"
+            element={
+              <ProtectedRoute>
+              <MyPostsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/my-comments"
+            element={
+              <ProtectedRoute>
+              <MyCommentsPage />
               </ProtectedRoute>
             }
           />
