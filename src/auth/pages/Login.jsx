@@ -40,7 +40,7 @@ const Login = () => {
       setLoading(true);
       await login(user);
       toast.success("Login successful!");
-      navigate(location.state?.from || "/profile");
+      navigate(location.state?.from || "/feed");
     } catch (error) {
       if (error.response) {
         // Server responded with error

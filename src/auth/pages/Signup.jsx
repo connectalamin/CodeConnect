@@ -51,7 +51,7 @@ const Signup = () => {
         password: user.password
       });
       toast.success('Registration successful!');
-      navigate('/profile'); // Navigate after successful login
+      navigate('/feed'); // Navigate after successful login
     } catch (error) {
       if (error.response) {
         switch (error.response.status) {

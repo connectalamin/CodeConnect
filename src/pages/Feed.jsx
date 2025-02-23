@@ -2,17 +2,21 @@ import Navbar from '../components/Navbar';
 import { Container, Grid, Stack, Text, Button, Card, Group } from '@mantine/core';
 import { useState } from 'react';
 import { useProfile } from '../hooks/useProfile';
+import { usePost } from '../hooks/usePost';
 import SearchComponent from '../components/Feed/SearchComponent';
 import PostComponent from '../components/Feed/PostComponent';
 import FilterComponent from '../components/Feed/FilterComponent';
 import AddPostComponent from '../components/Feed/AddPostComponent';
+import { FaStar } from 'react-icons/fa';
 
 const FeedPage = () => {
   const { profile } = useProfile();
+  const { posts, isLoading, isError, error } = usePost(); // Fetch posts using usePost hook
   const [opened, setOpened] = useState(false);
 
-  const upvotes = profile?.user?.votes?.filter(v => v.type === 'upvote')?.length || 0;
-  const downvotes = profile?.user?.votes?.filter(v => v.type === 'downvote')?.length || 0;
+
+  if (isLoading) return <div className="flex justify-center items-center h-screen">Loading...</div>;
+  if (isError) return <div className="flex justify-center items-center h-screen text-red-500">Error: {error}</div>;
 
   return (
     <>
@@ -77,7 +81,7 @@ const FeedPage = () => {
                         className="flex items-center gap-1"
                         style={{ lineHeight: '1.4' }}
                       >
-                        <span className="text-[#94d2bd]">📅</span>
+                        <span className="text-[#eeea1a]">📅</span>
                         Batch: {profile?.user?.batch || 'N/A'}
                       </Text>
                     </Stack>
@@ -120,24 +124,17 @@ const FeedPage = () => {
                       <span className="text-[#94d2bd]">🏆</span>
                       Ranking: {profile?.user?.ranking || 'Unranked'}
                     </Text>
-                    <Group spacing="sm" className="mt-2">
-                      <Text
-                        size="xs"
-                        weight={500}
-                        color="gray-700"
-                        className="flex items-center gap-1 bg-gray-100/50 px-2 py-1 rounded-md"
-                      >
-                        <span className="text-green-500">⬆</span> Upvotes: {upvotes}
-                      </Text>
-                      <Text
-                        size="xs"
-                        weight={500}
-                        color="gray-700"
-                        className="flex items-center gap-1 bg-gray-100/50 px-2 py-1 rounded-md"
-                      >
-                        <span className="text-red-500">⬇</span> Downvotes: {downvotes}
-                      </Text>
-                    </Group>
+                    <Text
+                      size="xs"
+                      weight={500}
+                      color="gray-700"
+                      className="flex items-center gap-1 bg-gray-100/50 px-2 py-1 rounded-md"
+                      style={{ lineHeight: '1.5' }}
+                    >
+                       <FaStar className="text-[#c21212]" />
+                      Karma Points: {profile?.user?.karmaPoints || '0'}
+                    </Text>
+                   
                   </Stack>
                 </div>
               </Card>
@@ -146,30 +143,13 @@ const FeedPage = () => {
             <Grid.Col span={6}>
               <div className="space-y-6">
                 <div className="space-y-4">
-                  <PostComponent
-                    title="Exploring New Tech"
-                    content="Just started learning about AI and its applications. Loving the journey so far!"
-                    author="Jane Smith"
-                    date="Feb 20, 2025"
-                    upvotes={15}
-                    downvotes={3}
-                  />
-                  <PostComponent
-                    title="Project Update"
-                    content="Finished the first phase of my app. Excited to share more soon!"
-                    author="Alex Brown"
-                    date="Feb 21, 2025"
-                    upvotes={28}
-                    downvotes={1}
-                  />
-                  <PostComponent
-                    title="Random Thoughts"
-                    content="Why do we call it a 'feed' anyway? Food for thought, I guess."
-                    author="Sam Lee"
-                    date="Feb 22, 2025"
-                    upvotes={10}
-                    downvotes={5}
-                  />
+                  {posts.length > 0 ? (
+                    posts.map((post) => <PostComponent key={post.id} post={post} />)
+                  ) : (
+                    <Text size="md" color="gray-600" className="text-center">
+                      No posts available.
+                    </Text>
+                  )}
                 </div>
                 <div className="flex justify-center">
                   <Group spacing="md" className="p-2 bg-white rounded-lg shadow-sm border border-gray-200">
