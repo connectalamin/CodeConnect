@@ -1,6 +1,6 @@
 import Navbar from '../components/Navbar';
 import { Container, Grid, Stack, Text, Button, Card, Group } from '@mantine/core';
-import { useState } from 'react'; // Added for useState
+import { useState } from 'react';
 import { useProfile } from '../hooks/useProfile';
 import SearchComponent from '../components/Feed/SearchComponent';
 import PostComponent from '../components/Feed/PostComponent';
@@ -9,9 +9,8 @@ import AddPostComponent from '../components/Feed/AddPostComponent';
 
 const FeedPage = () => {
   const { profile } = useProfile();
-  const [opened, setOpened] = useState(false); // State for controlling the AddPost modal
+  const [opened, setOpened] = useState(false);
 
-  // Assuming votes is an array of objects like [{ type: 'upvote' }, { type: 'downvote' }]
   const upvotes = profile?.user?.votes?.filter(v => v.type === 'upvote')?.length || 0;
   const downvotes = profile?.user?.votes?.filter(v => v.type === 'downvote')?.length || 0;
 
@@ -27,7 +26,7 @@ const FeedPage = () => {
             <Button
               radius="md"
               className="bg-[#94d2bd] text-white hover:bg-[#7cb8a4] transition-colors duration-200 shadow-sm hover:shadow-md"
-              onClick={() => setOpened(true)} // Opens the modal when clicked
+              onClick={() => setOpened(true)}
             >
               Add Post
             </Button>
@@ -177,7 +176,7 @@ const FeedPage = () => {
                     <Button
                       variant="subtle"
                       radius="md"
-                      className="text-gray-400 bg-gray-100 cursor-not-allowed opacity-60 hover:bg-gray-100 hover:text-gray-400" // Greyed out for first page
+                      className="text-gray-400 bg-gray-100 cursor-not-allowed opacity-60 hover:bg-gray-100 hover:text-gray-400"
                     >
                       Previous
                     </Button>
