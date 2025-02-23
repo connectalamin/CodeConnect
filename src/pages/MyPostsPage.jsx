@@ -1,24 +1,27 @@
-import { Container, Stack, Text, Card, Button, Group, TextInput, Modal, ActionIcon } from '@mantine/core';
+import { Container, Stack, Text, Card, Group, ActionIcon } from '@mantine/core';
 import { useState } from 'react';
 import { useProfile } from '../hooks/useProfile';
 import { usePost } from '../hooks/usePost';
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import HashLoader from 'react-spinners/HashLoader';
+import AddPostComponent from '../components/Feed/AddPostComponent';
+import Navbar from '../components/Navbar';
 
 const MyPostsPage = () => {
   const { profile } = useProfile();
   const { posts, isLoading } = usePost();
   const [modalOpened, setModalOpened] = useState(false);
-  const [editingPost, setEditingPost] = useState(null); // Placeholder for post being edited
-  const [editedTitle, setEditedTitle] = useState(''); // Placeholder for edited title
-  const [editedContent, setEditedContent] = useState(''); // Placeholder for edited content
+  const [editingPost, setEditingPost] = useState(null);
 
   if (isLoading) return <HashLoader color="#7ec226" loading speedMultiplier={2} />;
 
   const myPosts = posts.filter((post) => post.userId === profile?.user?.id);
 
   return (
+    <>
+      <Navbar />
     <Container size="xl" className="py-16">
+        
       <Stack spacing="lg">
         <Text size="xl" weight={900} className="text-gray-900">
           My Posts
@@ -42,8 +45,6 @@ const MyPostsPage = () => {
                       color="blue"
                       onClick={() => {
                         setEditingPost(post);
-                        setEditedTitle(post.title);
-                        setEditedContent(post.content);
                         setModalOpened(true);
                       }}
                     >
@@ -76,56 +77,17 @@ const MyPostsPage = () => {
           </Card>
         )}
 
-        {/* Edit Modal */}
-        <Modal
+        <AddPostComponent
           opened={modalOpened}
-          onClose={() => setModalOpened(false)}
-          title="Edit Post"
-          radius="md"
-          styles={{
-            modal: { backgroundColor: '#ffffff', border: '1px solid #e2e8f0' },
-            title: { fontSize: '1.25rem', fontWeight: 700, color: '#2d3748' },
+          onClose={() => {
+            setModalOpened(false);
+            setEditingPost(null);
           }}
-        >
-          <Stack spacing="md">
-            <TextInput
-              label="Title"
-              value={editedTitle}
-              onChange={(e) => setEditedTitle(e.currentTarget.value)}
-              required
-              radius="md"
-              styles={{ input: { borderColor: '#94d2bd' } }}
-            />
-            <TextInput
-              label="Content"
-              value={editedContent}
-              onChange={(e) => setEditedContent(e.currentTarget.value)}
-              required
-              radius="md"
-              styles={{ input: { borderColor: '#94d2bd' } }}
-            />
-            <Group position="right">
-              <Button
-                variant="outline"
-                color="gray"
-                onClick={() => setModalOpened(false)}
-              >
-                Cancel
-              </Button>
-              <Button
-                color="blue"
-                onClick={() => {
-                  // Placeholder for save action
-                  setModalOpened(false);
-                }}
-              >
-                Save
-              </Button>
-            </Group>
-          </Stack>
-        </Modal>
+          postToEdit={editingPost}
+        />
       </Stack>
     </Container>
+    </>
   );
 };
 

@@ -15,7 +15,7 @@ import { Link } from 'react-router-dom'; // For navigation
 
 const FeedPage = () => {
   const { profile } = useProfile();
-  const { posts, isLoading, isError, error, fetchNextPage, hasNextPage } = usePost();
+  const { posts, isLoading, isError, error} = usePost();
   const [opened, setOpened] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDateRange, setSelectedDateRange] = useState('All time');
@@ -95,7 +95,7 @@ const FeedPage = () => {
 
   return (
     <>
-      <Navbar />
+   <Navbar />
       <Container size="xl" className="py-16 px-4 bg-gradient-to-br from-[#f0f9eb] to-[#d4e8d9] text-gray-800 rounded-3xl">
         <Stack spacing="lg">
           <div className="flex justify-between items-center border-b border-gray-200 pb-4">

@@ -1,26 +1,30 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Modal, Stack, TextInput, Select, Button, Text, LoadingOverlay } from '@mantine/core';
 import hljs from 'highlight.js';
 import toast from 'react-hot-toast';
 import { useAuth } from '../../hooks/useAuth';
-import authService from '../../services/authService';
+import feedService from '../../services/feedService'; // Updated to use feedService
 import { useForm } from '@mantine/form';
+import { useQueryClient } from '@tanstack/react-query'; // For invalidating queries
 import 'highlight.js/styles/github-dark.css';
 
 hljs.configure({
-  languages: ['javascript', 'typescript', 'python', 'java', 'cpp', 'css', 'html', 'json']
+  languages: ['javascript', 'typescript', 'python', 'java', 'cpp', 'css', 'html', 'json'],
 });
 
-const AddPostComponent = ({ opened, onClose }) => {
+const AddPostComponent = ({ opened, onClose, postToEdit = null }) => {
   const { token } = useAuth();
+  const queryClient = useQueryClient(); // To manage query cache
   const [loading, setLoading] = useState(false);
   const [highlightedCode, setHighlightedCode] = useState('');
 
+  const isEditing = !!postToEdit; // Determine if in edit mode
+
   const form = useForm({
     initialValues: {
-      title: '',
-      content: '',
-      category: '',
+      title: postToEdit?.title || '',
+      content: postToEdit?.content || '',
+      category: postToEdit?.category || '',
     },
     validate: {
       title: (value) => (value.length < 1 ? 'Title is required' : null),
@@ -28,6 +32,18 @@ const AddPostComponent = ({ opened, onClose }) => {
       category: (value) => (value.length < 1 ? 'Category is required' : null),
     },
   });
+
+  // Update form values when postToEdit changes (e.g., when modal opens with a post)
+  useEffect(() => {
+    if (postToEdit) {
+      form.setValues({
+        title: postToEdit.title,
+        content: postToEdit.content,
+        category: postToEdit.category,
+      });
+      handleCodeHighlight(postToEdit.content); // Pre-highlight code
+    }
+  }, [postToEdit, form]);
 
   const handleSubmit = async (values) => {
     setLoading(true);
@@ -37,13 +53,23 @@ const AddPostComponent = ({ opened, onClose }) => {
         content: values.content,
         category: values.category,
       };
-      await authService.createPost(token, postData);
-      toast.success('Post created successfully!');
+
+      if (isEditing) {
+        // Placeholder for edit API call (to be implemented later)
+        // await feedService.updatePost(postToEdit.id, postData, token);
+        toast.success('Post updated successfully!');
+      } else {
+        await feedService.createPost(postData, token);
+        toast.success('Post created successfully!');
+        // Invalidate posts query to refetch and include the new post
+        queryClient.invalidateQueries(['posts', token]);
+      }
+
       onClose();
       form.reset();
       setHighlightedCode('');
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to create post');
+      toast.error(error.response?.data?.message || `Failed to ${isEditing ? 'update' : 'create'} post`);
     } finally {
       setLoading(false);
     }
@@ -62,7 +88,7 @@ const AddPostComponent = ({ opened, onClose }) => {
         form.reset();
         setHighlightedCode('');
       }}
-      title={<Text size="lg" weight={700} color="gray-900">Create New Post</Text>}
+      title={<Text size="lg" weight={700} color="gray-900">{isEditing ? 'Edit Post' : 'Create New Post'}</Text>}
       size="lg"
       radius="xl"
       className="bg-gradient-to-b from-white to-gray-50"
@@ -93,11 +119,12 @@ const AddPostComponent = ({ opened, onClose }) => {
               },
             }}
           />
-          
+
           <div className="code-editor">
             <TextInput
               component="textarea"
-              placeholder="Write your code here..."
+              label={<Text size="sm" weight={500} color="gray-700">Content</Text>}
+              placeholder="Write your content or code here..."
               {...form.getInputProps('content')}
               onChange={(e) => {
                 form.setFieldValue('content', e.target.value);
@@ -110,7 +137,7 @@ const AddPostComponent = ({ opened, onClose }) => {
                   color: '#c9d1d9',
                   padding: '1rem',
                   minHeight: '200px',
-                }
+                },
               }}
             />
           </div>
@@ -141,14 +168,14 @@ const AddPostComponent = ({ opened, onClose }) => {
               },
             }}
           />
-          
+
           <Button
             type="submit"
             radius="lg"
             className="bg-[#94d2bd] text-white hover:bg-[#7cb8a4] transition-colors duration-300 shadow-md hover:shadow-lg w-full"
             disabled={loading}
           >
-            {loading ? 'Creating...' : 'Create Post'}
+            {loading ? (isEditing ? 'Updating...' : 'Creating...') : (isEditing ? 'Update Post' : 'Create Post')}
           </Button>
         </Stack>
       </form>
