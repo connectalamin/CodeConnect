@@ -14,6 +14,7 @@ export const usePost = () => {
     error,
     fetchNextPage,
     hasNextPage,
+    refetch, // Add refetch for manual triggering if needed
   } = useInfiniteQuery({
     queryKey: ['posts', token],
     queryFn: async ({ pageParam = 1 }) => {
@@ -23,9 +24,12 @@ export const usePost = () => {
       }
 
       try {
+        console.log('Fetching posts with token:', token, 'page:', pageParam);
         const response = await feedService.getAllPosts(token, pageParam);
+        console.log('Posts fetched:', response);
         return response;
       } catch (err) {
+        console.error('Fetch error:', err);
         if (err.response?.status === 401) {
           localStorage.removeItem('token');
           navigate('/login');
@@ -47,5 +51,6 @@ export const usePost = () => {
     error: error?.message || null,
     fetchNextPage,
     hasNextPage,
+    refetch, // Expose refetch for debugging
   };
 };

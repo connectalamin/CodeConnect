@@ -59,7 +59,7 @@ const UserProfile = () => {
            
             <div className="flex items-center gap-6 mb-6">
               <img
-                src={user.image || 'https://i.pravatar.cc/150?img=1'}
+                src={user.image || 'https://i.pravatar.cc/150?img=4'}
                 alt={`${user.name}'s profile`}
                 className="w-20 h-20 rounded-full object-cover border-4 border-white shadow-lg"
               />

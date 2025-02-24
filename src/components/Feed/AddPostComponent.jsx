@@ -3,9 +3,9 @@ import { Modal, Stack, TextInput, Select, Button, Text, LoadingOverlay } from '@
 import hljs from 'highlight.js';
 import toast from 'react-hot-toast';
 import { useAuth } from '../../hooks/useAuth';
-import feedService from '../../services/feedService'; // Updated to use feedService
+import feedService from '../../services/feedService';
 import { useForm } from '@mantine/form';
-import { useQueryClient } from '@tanstack/react-query'; // For invalidating queries
+import { useQueryClient } from '@tanstack/react-query';
 import 'highlight.js/styles/github-dark.css';
 
 hljs.configure({
@@ -14,11 +14,11 @@ hljs.configure({
 
 const AddPostComponent = ({ opened, onClose, postToEdit = null }) => {
   const { token } = useAuth();
-  const queryClient = useQueryClient(); // To manage query cache
+  const queryClient = useQueryClient();
   const [loading, setLoading] = useState(false);
   const [highlightedCode, setHighlightedCode] = useState('');
 
-  const isEditing = !!postToEdit; // Determine if in edit mode
+  const isEditing = !!postToEdit;
 
   const form = useForm({
     initialValues: {
@@ -33,7 +33,6 @@ const AddPostComponent = ({ opened, onClose, postToEdit = null }) => {
     },
   });
 
-  // Update form values when postToEdit changes (e.g., when modal opens with a post)
   useEffect(() => {
     if (postToEdit) {
       form.setValues({
@@ -41,9 +40,9 @@ const AddPostComponent = ({ opened, onClose, postToEdit = null }) => {
         content: postToEdit.content,
         category: postToEdit.category,
       });
-      handleCodeHighlight(postToEdit.content); // Pre-highlight code
+      handleCodeHighlight(postToEdit.content);
     }
-  }, [postToEdit, form]);
+  }, [postToEdit]);
 
   const handleSubmit = async (values) => {
     setLoading(true);
@@ -55,20 +54,23 @@ const AddPostComponent = ({ opened, onClose, postToEdit = null }) => {
       };
 
       if (isEditing) {
-        // Placeholder for edit API call (to be implemented later)
-        // await feedService.updatePost(postToEdit.id, postData, token);
+        console.log('Updating post:', postToEdit.id, postData);
+        await feedService.updatePost(postToEdit.id, postData, token);
         toast.success('Post updated successfully!');
       } else {
+        console.log('Creating post:', postData);
         await feedService.createPost(postData, token);
         toast.success('Post created successfully!');
-        // Invalidate posts query to refetch and include the new post
-        queryClient.invalidateQueries(['posts', token]);
       }
 
+      // Invalidate and refetch posts
+      await queryClient.invalidateQueries(['posts', token], { refetch: true });
+      console.log('Posts query invalidated');
       onClose();
       form.reset();
       setHighlightedCode('');
     } catch (error) {
+      console.error('Submit error:', error);
       toast.error(error.response?.data?.message || `Failed to ${isEditing ? 'update' : 'create'} post`);
     } finally {
       setLoading(false);

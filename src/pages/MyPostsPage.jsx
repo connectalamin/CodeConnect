@@ -18,8 +18,8 @@ const MyPostsPage = () => {
   const queryClient = useQueryClient();
   const [modalOpened, setModalOpened] = useState(false);
   const [editingPost, setEditingPost] = useState(null);
-  const [deleteModalOpened, setDeleteModalOpened] = useState(false); // State for delete confirmation modal
-  const [postToDelete, setPostToDelete] = useState(null); // Track post to delete
+  const [deleteModalOpened, setDeleteModalOpened] = useState(false);
+  const [postToDelete, setPostToDelete] = useState(null);
 
   if (isLoading) return <HashLoader color="#7ec226" loading speedMultiplier={2} />;
 
@@ -34,8 +34,8 @@ const MyPostsPage = () => {
       toast.error(error.message || 'Failed to delete post');
       console.error('Delete error:', error);
     } finally {
-      setDeleteModalOpened(false); // Close the modal after action
-      setPostToDelete(null); // Clear the post to delete
+      setDeleteModalOpened(false);
+      setPostToDelete(null);
     }
   };
 
@@ -108,7 +108,6 @@ const MyPostsPage = () => {
             postToEdit={editingPost}
           />
 
-          {/* Styled Delete Confirmation Modal */}
           <Modal
             opened={deleteModalOpened}
             onClose={() => setDeleteModalOpened(false)}

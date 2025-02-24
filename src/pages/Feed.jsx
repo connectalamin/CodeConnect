@@ -1,6 +1,6 @@
 import Navbar from '../components/Navbar';
-import { Container, Grid, Stack, Text, Button, Card, Group, Tabs} from '@mantine/core'; // Added Anchor
-import { useState } from 'react';
+import { Container, Grid, Stack, Text, Button, Card, Group, Tabs } from '@mantine/core';
+import { useState, useEffect } from 'react';
 import { useProfile } from '../hooks/useProfile';
 import { usePost } from '../hooks/usePost';
 import SearchComponent from '../components/Feed/SearchComponent';
@@ -10,28 +10,38 @@ import AddPostComponent from '../components/Feed/AddPostComponent';
 import { FaStar } from 'react-icons/fa';
 import HashLoader from 'react-spinners/HashLoader';
 import toast from 'react-hot-toast';
-import { Link } from 'react-router-dom'; // For navigation
-
+import { Link } from 'react-router-dom';
 
 const FeedPage = () => {
   const { profile } = useProfile();
-  const { posts, isLoading, isError, error} = usePost();
+  const { posts, isLoading, isError, error } = usePost();
   const [opened, setOpened] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDateRange, setSelectedDateRange] = useState('All time');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedSort, setSelectedSort] = useState('Recent');
   const [currentPage, setCurrentPage] = useState(1);
-  const [visiblePosts, setVisiblePosts] = useState(5); // Initial 5 posts
-  const [visibleComments, setVisibleComments] = useState(5); // Initial 5 comments
+  const [visiblePosts, setVisiblePosts] = useState(5);
+  const [visibleComments, setVisibleComments] = useState(5);
   const postsPerPage = 3;
 
+  useEffect(() => {
+    console.log('Posts in FeedPage:', posts);
+  }, [posts]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [posts]);
+
   if (isLoading) return <HashLoader color="#7ec226" loading speedMultiplier={2} />;
-  if (isError) return toast.error(error);
+  if (isError) {
+    toast.error(error);
+    return null;
+  }
 
   const filterPostsByDate = (posts) => {
     const now = new Date();
-    return posts.filter((post) => {
+    const filtered = posts.filter((post) => {
       const postDate = new Date(post.createdAt);
       switch (selectedDateRange) {
         case 'Last 24 Hours':
@@ -39,12 +49,14 @@ const FeedPage = () => {
         case 'Last 7 days':
           return now - postDate <= 7 * 24 * 60 * 60 * 1000;
         case 'Last 30 days':
-          return now - postDate <= 30 * 24 * 60 * 1000;
+          return now - postDate <= 30 * 24 * 60 * 60 * 1000;
         case 'All time':
         default:
           return true;
       }
     });
+    console.log('Filtered by date:', filtered);
+    return filtered;
   };
 
   const filteredPosts = filterPostsByDate(posts).filter((post) =>
@@ -52,6 +64,7 @@ const FeedPage = () => {
       post.category?.toLowerCase().includes(searchTerm.toLowerCase())) &&
     (selectedCategory ? post.category?.toLowerCase() === selectedCategory.toLowerCase() : true)
   );
+  console.log('Filtered posts:', filteredPosts);
 
   const sortedPosts = filteredPosts.sort((a, b) => {
     if (selectedSort === 'Top') {
@@ -60,10 +73,12 @@ const FeedPage = () => {
       return new Date(b.createdAt) - new Date(a.createdAt);
     }
   });
+  console.log('Sorted posts:', sortedPosts);
 
   const indexOfLastPost = currentPage * postsPerPage;
   const indexOfFirstPost = indexOfLastPost - postsPerPage;
   const currentPosts = sortedPosts.slice(indexOfFirstPost, indexOfLastPost);
+  console.log('Current posts:', currentPosts, 'Page:', currentPage, 'Indices:', indexOfFirstPost, indexOfLastPost);
 
   const totalPages = Math.ceil(sortedPosts.length / postsPerPage);
 
@@ -79,23 +94,22 @@ const FeedPage = () => {
     }
   };
 
-  // Filter user's posts and comments
   const myPosts = posts.filter((post) => post.userId === profile?.user?.id);
   const myComments = posts
     .flatMap((post) => post.comments || [])
     .filter((comment) => comment.userId === profile?.user?.id);
 
   const handleShowMorePosts = () => {
-    setVisiblePosts(myPosts.length); // Show all posts
+    setVisiblePosts(myPosts.length);
   };
 
   const handleShowMoreComments = () => {
-    setVisibleComments(myComments.length); // Show all comments
+    setVisibleComments(myComments.length);
   };
 
   return (
     <>
-   <Navbar />
+      <Navbar />
       <Container size="xl" className="py-16 px-4 bg-gradient-to-br from-[#f0f9eb] to-[#d4e8d9] text-gray-800 rounded-3xl">
         <Stack spacing="lg">
           <div className="flex justify-between items-center border-b border-gray-200 pb-4">
@@ -266,7 +280,7 @@ const FeedPage = () => {
                               Show More
                             </Button>
                           ) : (
-                            <Link component={Link} to="/my-posts" size="xs" className="mt-2 text-[#0a3f1e]">
+                            <Link to="/my-posts" size="xs" className="mt-2 text-[#0a3f1e]">
                               Go to My Posts
                             </Link>
                           )
@@ -297,7 +311,7 @@ const FeedPage = () => {
                               Show More
                             </Button>
                           ) : (
-                            <Link component={Link} to="/my-comments" size="xs" className="mt-2 text-[#073324]">
+                            <Link to="/my-comments" size="xs" className="mt-2 text-[#073324]">
                               Go to My Comments
                             </Link>
                           )
@@ -310,7 +324,13 @@ const FeedPage = () => {
             </Grid.Col>
           </Grid>
 
-          <AddPostComponent opened={opened} onClose={() => setOpened(false)} />
+          <AddPostComponent
+            opened={opened}
+            onClose={() => {
+              setOpened(false);
+              setCurrentPage(1);
+            }}
+          />
         </Stack>
       </Container>
     </>

@@ -40,11 +40,14 @@ const feedService = {
 
   updatePost: async (postId, postData, token) => {
     try {
+     
       const response = await axios.patch(`${API_URL}/api/post/${postId}`, postData, {
         headers: { Authorization: `Bearer ${token}` },
       });
+     
       return response.data;
     } catch (error) {
+      
       throw new Error(error.response?.data?.error || 'Failed to update post');
     }
   },

@@ -3,7 +3,7 @@ import { TbLogout2 } from "react-icons/tb";
 import { CiMenuFries } from "react-icons/ci";
 import { MdOutlineKeyboardArrowRight } from "react-icons/md";
 import { Group } from "@mantine/core";
-import { AiOutlineFire } from "react-icons/ai";
+import { AiOutlineComment, AiOutlineFire, AiOutlineInbox } from "react-icons/ai";
 import { IoInformationCircleOutline } from "react-icons/io5";
 import { FiUser } from "react-icons/fi";
 import { IoSettingsOutline } from "react-icons/io5";
@@ -16,11 +16,10 @@ import { useProfile } from "../hooks/useProfile";
 
 const Navbar = () => {
   const [accountMenuOpen, setAccountMenuOpen] = useState(false);
-
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [isMegaMenuCollapse, setIsMegaMenuCollapse] = useState(false);
   const [megaMenuSubItemsOpen, setMegaMenuSubItemsOpen] = useState("");
-  const { isAuthenticated, logout } = useAuth(); // Get auth status, logout, and user data
+  const { isAuthenticated, logout } = useAuth(); // Get auth status and logout
   const navigate = useNavigate();
   const { profile, loading } = useProfile();
 
@@ -28,32 +27,43 @@ const Navbar = () => {
   const handleLogout = async () => {
     await logout(); // Wait for logout to complete
     setAccountMenuOpen(false); // Close dropdown on logout
-    navigate("/", { replace: true }); // Close dropdown on logout
+    navigate("/", { replace: true }); // Redirect to home
   };
 
   return (
     <nav className="flex items-center justify-between w-full relative px-4 max-w-[1440px] mx-auto">
       {/* Logo */}
-      <Group
-      >
- <img
-        src={Logo}
-        alt="CodeConnect Logo"
-        className="w-[55px] object-contain transform rotate-45" // Rotated logo, matching your branding
-      />
-      <h1 className="text-[1.5rem] font-bold text-[#7ed957]">CodeConnect</h1>
+      <Group>
+        <img
+          src={Logo}
+          alt="CodeConnect Logo"
+          className="w-[55px] object-contain transform rotate-45" // Rotated logo
+        />
+        <h1 className="text-[1.5rem] font-bold text-[#7ed957]">CodeConnect</h1>
       </Group>
-     
+
       {/* Nav Links (Desktop) */}
       <ul className="items-center gap-[20px] text-[1rem] text-[#424242] md:flex hidden">
-        {/* Product Mega Menu */}
-
         <li className="flex items-center hover:text-[#3B9DF8] group gap-[5px] cursor-pointer">
           <AiOutlineFire className="text-[1.1rem] group-hover:text-[#3B9DF8] text-gray-600" />
           <NavLink to={isAuthenticated() ? "/feed" : "/"}>
             {isAuthenticated() ? "Feed" : "Home"}
           </NavLink>
         </li>
+
+        {/* Conditionally render My Posts and My Comments only if authenticated */}
+        {isAuthenticated() && (
+          <>
+            <li className="flex items-center hover:text-[#3B9DF8] group gap-[5px] cursor-pointer">
+              <AiOutlineInbox className="text-[1.1rem] group-hover:text-[#3B9DF8] text-gray-600" />
+              <NavLink to="/my-posts">My Posts</NavLink>
+            </li>
+            <li className="flex items-center hover:text-[#3B9DF8] group gap-[5px] cursor-pointer">
+              <AiOutlineComment className="text-[1.1rem] group-hover:text-[#3B9DF8] text-gray-600" />
+              <NavLink to="/my-comments">My Comments</NavLink>
+            </li>
+          </>
+        )}
 
         <li className="flex items-center hover:text-[#3B9DF8] group gap-[5px] cursor-pointer">
           <IoInformationCircleOutline className="text-[1.1rem] group-hover:text-[#3B9DF8] text-gray-600" />
@@ -90,10 +100,7 @@ const Navbar = () => {
             </NavLink>
 
             {profile?.user?.name && (
-              <h1
-                className="text-[1rem]  text-gray-600 font-semibold
-           sm:block hidden"
-              >
+              <h1 className="text-[1rem] text-gray-600 font-semibold sm:block hidden">
                 {profile.user.name.split(" ")[0]}
               </h1>
             )}
@@ -239,10 +246,17 @@ const Navbar = () => {
             </ul>
           </div>
 
+          {/* Mobile Links */}
           {isAuthenticated() ? (
             <>
               <li className="hover:text-[#3B9DF8] transition-all duration-500 cursor-pointer capitalize">
-                <NavLink to="/">Feed</NavLink>
+                <NavLink to="/feed">Feed</NavLink>
+              </li>
+              <li className="hover:text-[#3B9DF8] transition-all duration-500 cursor-pointer capitalize">
+                <NavLink to="/my-posts">My Posts</NavLink>
+              </li>
+              <li className="hover:text-[#3B9DF8] transition-all duration-500 cursor-pointer capitalize">
+                <NavLink to="/my-comments">My Comments</NavLink>
               </li>
               <li className="hover:text-[#3B9DF8] transition-all duration-500 cursor-pointer capitalize">
                 <NavLink to="/about">About</NavLink>
@@ -263,7 +277,7 @@ const Navbar = () => {
           ) : (
             <>
               <li className="hover:text-[#3B9DF8] transition-all duration-500 cursor-pointer capitalize">
-                <NavLink to="/">Feed</NavLink>
+                <NavLink to="/">Home</NavLink>
               </li>
               <li className="hover:text-[#3B9DF8] transition-all duration-500 cursor-pointer capitalize">
                 <NavLink to="/about">About</NavLink>
