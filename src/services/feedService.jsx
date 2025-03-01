@@ -111,6 +111,7 @@ const feedService = {
       });
       return response.data;
     } catch (error) {
+      console.error('Full vote error:', error.response?.data || error.message);
       throw new Error(error.response?.data?.error || 'Failed to cast vote');
     }
   },

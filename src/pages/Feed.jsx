@@ -33,7 +33,11 @@ const FeedPage = () => {
     setCurrentPage(1);
   }, [posts]);
 
-  if (isLoading) return <HashLoader color="#7ec226" loading speedMultiplier={2} />;
+  if (isLoading) return (
+    <div className="flex justify-center items-center h-screen">
+      <HashLoader color="#7ec226" loading speedMultiplier={2} />
+    </div>
+  );
   if (isError) {
     toast.error(error);
     return null;

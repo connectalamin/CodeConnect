@@ -6,6 +6,7 @@ import { useCastVoteOnPost } from '../hooks/useCastVoteOnPost';
 import { useCastVoteOnComment } from '../hooks/useCastVoteOnComment';
 import { useAuth } from '../hooks/useAuth';
 import Navbar from '../components/Navbar';
+import HashLoader from 'react-spinners/HashLoader';
 import { Container, Stack, Card, Text, Group, Badge, ActionIcon, Textarea, Button } from '@mantine/core';
 
 // Separate component for comment to use hooks at component level
@@ -91,7 +92,11 @@ const SinglePostPage = () => {
     return null;
   }
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return (
+    <div className="flex justify-center items-center h-screen">
+      <HashLoader color="#7ec226" loading speedMultiplier={2} />
+    </div>
+  );
   if (isError) return <div>Error: {error?.message || 'An error occurred'}</div>;
   if (!post || !post.user) return <div>Post not found</div>;
 
