@@ -69,3 +69,77 @@
   font-size: 0.875rem;
   font-family: monospace;
 }
+
+.glow-effect {
+  position: relative;
+  overflow: hidden;
+}
+
+.glow-effect::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.7) 50%, /* Brighter for more contrast */
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: rotate(30deg);
+  animation: shine 2s infinite; /* Faster for more noticeable effect */
+  pointer-events: none;
+}
+
+.glow-effect:hover::before {
+  animation: shine 1.5s infinite; /* Even faster on hover */
+}
+
+@keyframes shine {
+  0% {
+    transform: translateX(-100%) rotate(30deg);
+  }
+  50% {
+    transform: translateX(100%) rotate(30deg);
+  }
+  100% {
+    transform: translateX(-100%) rotate(30deg);
+  }
+}
+
+/* Ensure the editor matches your app's rounded corners and shadows */
+.ql-container {
+  border-radius: 0.5rem; /* Matches Mantine's md radius */
+  border: 1px solid #d1d5db; /* Gray-300 */
+  background-color: #ffffff;
+  font-family: inherit;
+}
+
+/* Toolbar styling */
+.ql-toolbar.ql-snow {
+  border-radius: 0.5rem 0.5rem 0 0;
+  border: 1px solid #d1d5db;
+  border-bottom: none;
+  background-color: #f9fafb; /* Light gray for contrast */
+}
+
+/* Editor content area */
+.ql-editor {
+  min-height: 100px; /* Matches the previous Textarea's minRows={3} feel */
+  padding: 1rem;
+  color: #374151; /* Gray-700 for text */
+}
+
+/* Placeholder styling */
+.ql-editor.ql-blank::before {
+  color: #6b7280; /* Gray-500 for placeholder */
+  font-style: normal;
+}
+
+/* Button hover effects in toolbar */
+.ql-toolbar .ql-button:hover {
+  background-color: #94d2bd; /* Your accent color */
+  color: #ffffff;
+}

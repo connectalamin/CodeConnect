@@ -4,7 +4,7 @@ const API_URL = 'http://localhost:5000';
 
 // FeedService for handling posts, comments, and votes
 const feedService = {
-  // Posts
+  // Posts (unchanged)
   getAllPosts: async (token) => {
     try {
       const response = await axios.get(`${API_URL}/api/posts`, {
@@ -40,14 +40,11 @@ const feedService = {
 
   updatePost: async (postId, postData, token) => {
     try {
-     
       const response = await axios.patch(`${API_URL}/api/post/${postId}`, postData, {
         headers: { Authorization: `Bearer ${token}` },
       });
-     
       return response.data;
     } catch (error) {
-      
       throw new Error(error.response?.data?.error || 'Failed to update post');
     }
   },
@@ -63,10 +60,10 @@ const feedService = {
     }
   },
 
-  // Comments
+  // Comments (unchanged)
   getCommentsByPostId: async (postId, token) => {
     try {
-      const response = await axios.get(`${API_URL}/api/post/${postId}/comments`, {
+      const response = await axios.get(`${API_URL}/api/post/${postId}/comment`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       return response.data;
@@ -77,7 +74,7 @@ const feedService = {
 
   createComment: async (postId, commentData, token) => {
     try {
-      const response = await axios.post(`${API_URL}/api/post/${postId}/comments`, commentData, {
+      const response = await axios.post(`${API_URL}/api/post/${postId}/comment`, commentData, {
         headers: { Authorization: `Bearer ${token}` },
       });
       return response.data;
@@ -85,10 +82,9 @@ const feedService = {
       throw new Error(error.response?.data?.error || 'Failed to create comment');
     }
   },
-
   updateComment: async (postId, commentId, commentData, token) => {
     try {
-      const response = await axios.patch(`${API_URL}/api/post/${postId}/comments/${commentId}`, commentData, {
+      const response = await axios.patch(`${API_URL}/api/post/${postId}/comment/${commentId}`, commentData, {
         headers: { Authorization: `Bearer ${token}` },
       });
       return response.data;
@@ -99,7 +95,7 @@ const feedService = {
 
   deleteComment: async (postId, commentId, token) => {
     try {
-      const response = await axios.delete(`${API_URL}/api/post/${postId}/comments/${commentId}`, {
+      const response = await axios.delete(`${API_URL}/api/post/${postId}/comment/${commentId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       return response.data;
@@ -108,48 +104,14 @@ const feedService = {
     }
   },
 
-  // Votes (for Posts and Comments)
-  castVoteOnPost: async (postId, voteData, token) => {
+  castVote: async (voteData, token) => {
     try {
-      const response = await axios.post(`${API_URL}/api/post/${postId}/votes`, voteData, {
+      const response = await axios.post(`${API_URL}/api/votes`, voteData, {
         headers: { Authorization: `Bearer ${token}` },
       });
       return response.data;
     } catch (error) {
-      throw new Error(error.response?.data?.error || 'Failed to cast vote on post');
-    }
-  },
-
-  castVoteOnComment: async (postId, commentId, voteData, token) => {
-    try {
-      const response = await axios.post(`${API_URL}/api/post/${postId}/comments/${commentId}/votes`, voteData, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      return response.data;
-    } catch (error) {
-      throw new Error(error.response?.data?.error || 'Failed to cast vote on comment');
-    }
-  },
-
-  removeVoteOnPost: async (postId, voteId, token) => {
-    try {
-      const response = await axios.delete(`${API_URL}/api/post/${postId}/votes/${voteId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      return response.data;
-    } catch (error) {
-      throw new Error(error.response?.data?.error || 'Failed to remove vote on post');
-    }
-  },
-
-  removeVoteOnComment: async (postId, commentId, voteId, token) => {
-    try {
-      const response = await axios.delete(`${API_URL}/api/post/${postId}/comments/${commentId}/votes/${voteId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      return response.data;
-    } catch (error) {
-      throw new Error(error.response?.data?.error || 'Failed to remove vote on comment');
+      throw new Error(error.response?.data?.error || 'Failed to cast vote');
     }
   },
 };

@@ -15,6 +15,7 @@ import UpdateProfile from "./pages/UpdateProfile";
 import Feed from "./pages/Feed";
 import MyPostsPage from "./pages/MyPostsPage";
 import MyCommentsPage from "./pages/MyCommentsPage";
+import SinglePostPage from "./pages/SinglePost";
 function App() {
   return (
     <AuthProvider>
@@ -103,6 +104,14 @@ function App() {
               </ProtectedRoute>
             }
           />
+         <Route
+  path="/post/:postId"
+  element={
+    <ProtectedRoute>
+      <SinglePostPage />
+    </ProtectedRoute>
+  }
+/>
           <Route path="/empty" element={<Error />} />
           <Route path="*" element={<NotFound />} /> {/* Catch-all for 404 */}
         </Routes>

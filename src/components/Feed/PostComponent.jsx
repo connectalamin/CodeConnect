@@ -1,4 +1,5 @@
 import { Card, Text, Stack, Badge, Group, ActionIcon } from '@mantine/core';
+import { Link } from 'react-router-dom';
 
 const PostComponent = ({ post }) => {
   return (
@@ -71,13 +72,21 @@ const PostComponent = ({ post }) => {
             </Text>
           </Group>
           <Group spacing="xs">
-            <ActionIcon size="lg" color="gray" radius="md">
-              <Text size="md">💬</Text>
-            </ActionIcon>
-            <Text size="sm" weight={500} color="gray-600">
-              {post.comments.length}
-            </Text>
-          </Group>
+  {post.id ? (
+    <Link to={`/post/${post.id}`}>
+      <ActionIcon size="lg" color="gray" radius="md">
+        <Text size="md">💬</Text>
+      </ActionIcon>
+    </Link>
+  ) : (
+    <ActionIcon size="lg" color="gray" radius="md" disabled>
+      <Text size="md">💬</Text>
+    </ActionIcon>
+  )}
+  <Text size="sm" weight={500} color="gray-600">
+    {post.comments?.length || 0}
+  </Text>
+</Group>
         </Group>
       </Stack>
     </Card>
