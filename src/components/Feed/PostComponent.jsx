@@ -1,7 +1,15 @@
 import { Card, Text, Stack, Badge, Group, ActionIcon } from '@mantine/core';
 import { Link } from 'react-router-dom';
+import { useCastVoteOnPost } from '../../hooks/useCastVoteOnPost';
 
 const PostComponent = ({ post }) => {
+  const castVoteOnPostMutation = useCastVoteOnPost(post.id);
+
+  const handlePostVote = (voteType) => {
+    const value = voteType === 'up' ? 1 : -1;
+    castVoteOnPostMutation.mutate({ value });
+  };
+
   return (
     <Card
       shadow="md"
@@ -56,7 +64,7 @@ const PostComponent = ({ post }) => {
         {/* Footer: Voting and interaction */}
         <Group spacing="lg" className="mt-3">
           <Group spacing="xs">
-            <ActionIcon size="lg" color="gray" radius="md">
+            <ActionIcon size="lg" color="gray" radius="md" onClick={() => handlePostVote('up')}>
               <Text size="md">👍</Text>
             </ActionIcon>
             <Text size="sm" weight={500} color="gray-600">
@@ -64,7 +72,7 @@ const PostComponent = ({ post }) => {
             </Text>
           </Group>
           <Group spacing="xs">
-            <ActionIcon size="lg" color="gray" radius="md">
+            <ActionIcon size="lg" color="gray" radius="md" onClick={() => handlePostVote('down')}>
               <Text size="md">👎</Text>
             </ActionIcon>
             <Text size="sm" weight={500} color="gray-600">
@@ -72,21 +80,21 @@ const PostComponent = ({ post }) => {
             </Text>
           </Group>
           <Group spacing="xs">
-  {post.id ? (
-    <Link to={`/post/${post.id}`}>
-      <ActionIcon size="lg" color="gray" radius="md">
-        <Text size="md">💬</Text>
-      </ActionIcon>
-    </Link>
-  ) : (
-    <ActionIcon size="lg" color="gray" radius="md" disabled>
-      <Text size="md">💬</Text>
-    </ActionIcon>
-  )}
-  <Text size="sm" weight={500} color="gray-600">
-    {post.comments?.length || 0}
-  </Text>
-</Group>
+            {post.id ? (
+              <Link to={`/post/${post.id}`}>
+                <ActionIcon size="lg" color="gray" radius="md">
+                  <Text size="md">💬</Text>
+                </ActionIcon>
+              </Link>
+            ) : (
+              <ActionIcon size="lg" color="gray" radius="md" disabled>
+                <Text size="md">💬</Text>
+              </ActionIcon>
+            )}
+            <Text size="sm" weight={500} color="gray-600">
+              {post.comments?.length || 0}
+            </Text>
+          </Group>
         </Group>
       </Stack>
     </Card>
