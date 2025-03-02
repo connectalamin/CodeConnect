@@ -1,9 +1,9 @@
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from './useAuth';
 import feedService from '../services/feedService';
 
-export const usePost = () => {
+export const usePost = (page = 1, pageSize = 3) => {
   const navigate = useNavigate();
   const { token, isAuthenticated } = useAuth();
 
@@ -12,20 +12,18 @@ export const usePost = () => {
     isLoading,
     isError,
     error,
-    fetchNextPage,
-    hasNextPage,
     refetch, // Add refetch for manual triggering if needed
-  } = useInfiniteQuery({
-    queryKey: ['posts', token],
-    queryFn: async ({ pageParam = 1 }) => {
+  } = useQuery({
+    queryKey: ['posts', token, page, pageSize],
+    queryFn: async () => {
       if (!isAuthenticated()) {
         navigate('/login');
         throw new Error('Not authenticated');
       }
 
       try {
-        console.log('Fetching posts with token:', token, 'page:', pageParam);
-        const response = await feedService.getAllPosts(token, pageParam);
+        console.log('Fetching posts with token:', token, 'page:', page, 'pageSize:', pageSize);
+        const response = await feedService.getAllPosts(token, page, pageSize);
         console.log('Posts fetched:', response);
         return response;
       } catch (err) {
@@ -37,7 +35,6 @@ export const usePost = () => {
         throw err;
       }
     },
-    getNextPageParam: (lastPage) => lastPage.nextPage ?? false,
     enabled: !!token && isAuthenticated(),
     retry: 1,
     staleTime: 1000 * 60 * 5,
@@ -45,12 +42,11 @@ export const usePost = () => {
   });
 
   return {
-    posts: data?.pages.flatMap(page => page.posts) || [],
+    posts: data?.posts || [],
+    totalPosts: data?.total || 0, // Assuming the API returns total posts
     isLoading,
     isError,
     error: error?.message || null,
-    fetchNextPage,
-    hasNextPage,
-    refetch, // Expose refetch for debugging
+    refetch,
   };
 };

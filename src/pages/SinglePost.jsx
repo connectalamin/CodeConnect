@@ -3,11 +3,12 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useSinglePost } from '../hooks/useSinglePost';
 import { useCreateComment } from '../hooks/useCreateComment';
 import { useCastVoteOnPost } from '../hooks/useCastVoteOnPost';
-import { useCastVoteOnComment } from '../hooks/useCastVoteOnComment';
+import { useCastVoteOnComment } from '../hooks/useCastVoteOnComment'; // Import useCastVoteOnComment
 import { useAuth } from '../hooks/useAuth';
 import Navbar from '../components/Navbar';
 import HashLoader from 'react-spinners/HashLoader';
-import { Container, Stack, Card, Text, Group, Badge, ActionIcon, Textarea, Button } from '@mantine/core';
+import { Container, Stack, Card, Text, Group, ActionIcon, Textarea, Button } from '@mantine/core';
+import PostComponent from '../components/Feed/PostComponent'; // Import PostComponent
 
 // Separate component for comment to use hooks at component level
 const CommentCard = ({ comment, postId }) => {
@@ -84,7 +85,7 @@ const SinglePostPage = () => {
   const { isAuthenticated } = useAuth();
   const { post, comments, isLoading, isError, error } = useSinglePost(postId);
   const createCommentMutation = useCreateComment(postId);
-  const castVoteOnPostMutation = useCastVoteOnPost(postId);
+  const castVoteOnPostMutation = useCastVoteOnPost(postId); // Define castVoteOnPostMutation
   const [commentText, setCommentText] = useState('');
 
   if (!isAuthenticated()) {
@@ -117,82 +118,11 @@ const SinglePostPage = () => {
       <Navbar />
       <Container size="xl" className="py-16 px-4 bg-gradient-to-br from-[#f0f9eb] to-[#d4e8d9] text-gray-800 rounded-3xl">
         <Stack spacing="lg">
-          <Card
-            shadow="md"
-            radius="xl"
-            className="p-5 bg-gradient-to-b from-white to-gray-50 border border-gray-200 transition-all duration-300 hover:shadow-xl hover:border-[#94d2bd]"
-          >
-            <Stack spacing="md">
-              <Group position="apart" className="flex items-center">
-                <Group spacing="sm">
-                  <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center ring-2 ring-[#94d2bd]/20 hover:ring-[#94d2bd]/40 transition-all duration-300">
-                    <Text size="lg" weight={700} color="gray-500" className="uppercase">
-                      {post.user?.name?.[0] || 'U'}
-                    </Text>
-                  </div>
-                  <Stack spacing={0}>
-                    <Group spacing="xs">
-                      <Text size="md" weight={600} color="gray-900" className="line-clamp-1">
-                        {post.user?.name || 'Unknown User'}
-                      </Text>
-                      <Text
-                        size="sm"
-                        weight={700}
-                        className="px-2 py-1 rounded-md bg-gradient-to-r from-[#d4af37] via-[#f4c430] to-[#d4af37] text-gray-900 shadow-lg border border-[#b8860b] transform transition-all hover:scale-105 hover:shadow-xl glow-effect"
-                      >
-                        {post.user?.ranking || 'N/A'}
-                      </Text>
-                    </Group>
-                    <Text size="xs" color="gray-500" className="line-clamp-1">
-                      {post.createdAt ? new Date(post.createdAt).toLocaleString() : 'Unknown Date'}
-                    </Text>
-                  </Stack>
-                </Group>
-                <Badge
-                  size="sm"
-                  radius="md"
-                  className="bg-[#94d2bd]/10 text-[#94d2bd] hover:bg-[#94d2bd]/30 transition-colors duration-200"
-                >
-                  {post.category || 'Uncategorized'}
-                </Badge>
-              </Group>
-              <Stack spacing="sm">
-                <Text size="xl" weight={700} className="text-gray-900">
-                  {post.title || 'Untitled'}
-                </Text>
-                <Text size="md" color="gray-700">
-                  {post.content || 'No content available'}
-                </Text>
-              </Stack>
-              <Group spacing="lg" className="mt-3">
-                <Group spacing="xs">
-                  <ActionIcon size="lg" color="gray" radius="md" onClick={() => handlePostVote('up')}>
-                    <Text size="md">👍</Text>
-                  </ActionIcon>
-                  <Text size="sm" weight={500} color="gray-600">
-                    {post.upvotes || 0}
-                  </Text>
-                </Group>
-                <Group spacing="xs">
-                  <ActionIcon size="lg" color="gray" radius="md" onClick={() => handlePostVote('down')}>
-                    <Text size="md">👎</Text>
-                  </ActionIcon>
-                  <Text size="sm" weight={500} color="gray-600">
-                    {post.downvotes || 0}
-                  </Text>
-                </Group>
-                <Group spacing="xs">
-                  <ActionIcon size="lg" color="gray" radius="md">
-                    <Text size="md">💬</Text>
-                  </ActionIcon>
-                  <Text size="sm" weight={500} color="gray-600">
-                    {comments.length}
-                  </Text>
-                </Group>
-              </Group>
-            </Stack>
-          </Card>
-
+          <PostComponent 
+            post={post} 
+            onVote={handlePostVote} // Pass the vote handler to PostComponent
+          />
+          
           <Stack spacing="md">
             <Text size="lg" weight={700} className="text-gray-900">
               Comments
