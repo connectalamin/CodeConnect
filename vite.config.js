@@ -15,4 +15,19 @@ export default defineConfig({
       },
     },
   },
+  build: {
+    target: 'esnext',
+    minify: 'esbuild',
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor': ['react', 'react-dom', '@mantine/core'],
+          'post': ['../components/Feed/PostComponent'],
+        },
+      },
+    },
+  },
+  optimizeDeps: {
+    include: ['react', 'react-dom', '@mantine/core', '@mantine/hooks'],
+  },
 })

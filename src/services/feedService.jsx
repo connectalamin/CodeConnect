@@ -82,9 +82,9 @@ const feedService = {
       throw new Error(error.response?.data?.error || 'Failed to create comment');
     }
   },
-  updateComment: async (postId, commentId, commentData, token) => {
+  updateComment: async (commentId, commentData, token) => {
     try {
-      const response = await axios.patch(`${API_URL}/api/post/${postId}/comment/${commentId}`, commentData, {
+      const response = await axios.patch(`${API_URL}/api/post/comment/${commentId}`, commentData, {
         headers: { Authorization: `Bearer ${token}` },
       });
       return response.data;
@@ -95,7 +95,7 @@ const feedService = {
 
   deleteComment: async (postId, commentId, token) => {
     try {
-      const response = await axios.delete(`${API_URL}/api/post/${postId}/comment/${commentId}`, {
+      const response = await axios.delete(`${API_URL}/api/post//comment/${commentId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       return response.data;

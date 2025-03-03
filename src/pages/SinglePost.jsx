@@ -3,20 +3,90 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useSinglePost } from '../hooks/useSinglePost';
 import { useCreateComment } from '../hooks/useCreateComment';
 import { useCastVoteOnPost } from '../hooks/useCastVoteOnPost';
-import { useCastVoteOnComment } from '../hooks/useCastVoteOnComment'; // Import useCastVoteOnComment
+import { useCastVoteOnComment } from '../hooks/useCastVoteOnComment';
+import { useUpdateComment } from '../hooks/useUpdateComment';
+import { useDeleteComment } from '../hooks/useDeleteComment';
 import { useAuth } from '../hooks/useAuth';
 import Navbar from '../components/Navbar';
 import HashLoader from 'react-spinners/HashLoader';
-import { Container, Stack, Card, Text, Group, ActionIcon, Textarea, Button } from '@mantine/core';
-import PostComponent from '../components/Feed/PostComponent'; // Import PostComponent
+import { Container, Stack, Card, Text, Group, ActionIcon, Menu, Button, Textarea } from '@mantine/core';
+import PostComponent from '../components/Feed/PostComponent';
+import { CiMenuKebab } from "react-icons/ci";
+import toast from 'react-hot-toast';
 
-// Separate component for comment to use hooks at component level
 const CommentCard = ({ comment, postId }) => {
   const castVoteOnCommentMutation = useCastVoteOnComment(postId, comment.id);
-  
+  const editCommentMutation = useUpdateComment(comment.id);
+  const deleteCommentMutation = useDeleteComment(postId, comment.id);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedContent, setEditedContent] = useState(comment.content);
+
   const handleVote = (voteType) => {
     const value = voteType === 'up' ? 1 : -1;
-    castVoteOnCommentMutation.mutate({ value });
+    castVoteOnCommentMutation.mutate({ value }, {
+      onSuccess: () => {
+        toast.success(`Comment ${voteType === 'up' ? 'upvoted' : 'downvoted'} successfully`, {
+          style: {
+            background: '#10b981',
+            color: '#fff'
+
+          }
+        });
+      },
+      onError: (error) => {
+        toast.error(error?.message || 'Failed to vote on comment', {
+          style: {
+            background: '#ef4444',
+            color: '#fff'
+          }
+        });
+      }
+    });
+  };
+
+  const handleEdit = () => {
+    if (editedContent.trim()) {
+      editCommentMutation.mutate({ content: editedContent }, {
+        onSuccess: () => {
+          setIsEditing(false);
+          toast.success('Comment updated successfully', {
+            style: {
+              background: '#10b981',
+              color: '#fff'
+            }
+          });
+        },
+        onError: (error) => {
+          toast.error(error?.message || 'Failed to update comment', {
+            style: {
+              background: '#ef4444',
+              color: '#fff'
+            }
+          });
+        }
+      });
+    }
+  };
+
+  const handleDelete = () => {
+    deleteCommentMutation.mutate(undefined, {
+      onSuccess: () => {
+        toast.success('Comment deleted successfully', {
+          style: {
+            background: '#10b981',
+            color: '#fff'
+          }
+        });
+      },
+      onError: (error) => {
+        toast.error(error?.message || 'Failed to delete comment', {
+          style: {
+            background: '#ef4444',
+            color: '#fff'
+          }
+        });
+      }
+    });
   };
 
   return (
@@ -52,10 +122,41 @@ const CommentCard = ({ comment, postId }) => {
               </Text>
             </Stack>
           </Group>
+          <Menu shadow="md" width={200} withinPortal>
+            <Menu.Target>
+              <ActionIcon size="sm" variant="subtle" color="gray">
+                <CiMenuKebab color='black'/>  
+              </ActionIcon>
+            </Menu.Target>
+            <Menu.Dropdown>
+              <Menu.Item onClick={() => setIsEditing(true)}>
+                Edit
+              </Menu.Item>
+              <Menu.Item color="red" onClick={handleDelete}>
+                Delete
+              </Menu.Item>
+            </Menu.Dropdown>
+          </Menu>
         </Group>
-        <Text size="sm" color="gray-700">
-          {comment.content || 'No content'}
-        </Text>
+        {isEditing ? (
+          <>
+            <Textarea
+              value={editedContent}
+              onChange={(e) => setEditedContent(e.target.value)}
+              placeholder="Edit your comment..."
+              autosize
+              minRows={2}
+            />
+            <Group position="right" mt="sm">
+              <Button onClick={handleEdit}>Save</Button>
+              <Button variant="outline" onClick={() => setIsEditing(false)}>Cancel</Button>
+            </Group>
+          </>
+        ) : (
+          <Text size="sm" color="gray-700">
+            {comment.content || 'No content'}
+          </Text>
+        )}
         <Group spacing="lg">
           <Group spacing="xs">
             <ActionIcon size="md" color="gray" radius="md" onClick={() => handleVote('up')}>
@@ -85,7 +186,7 @@ const SinglePostPage = () => {
   const { isAuthenticated } = useAuth();
   const { post, comments, isLoading, isError, error } = useSinglePost(postId);
   const createCommentMutation = useCreateComment(postId);
-  const castVoteOnPostMutation = useCastVoteOnPost(postId); // Define castVoteOnPostMutation
+  const castVoteOnPostMutation = useCastVoteOnPost(postId);
   const [commentText, setCommentText] = useState('');
 
   if (!isAuthenticated()) {
@@ -103,14 +204,54 @@ const SinglePostPage = () => {
 
   const handleCommentSubmit = () => {
     if (commentText.trim()) {
-      createCommentMutation.mutate({ content: commentText });
-      setCommentText('');
+      createCommentMutation.mutate(
+        { content: commentText },
+        {
+          onSuccess: () => {
+            setCommentText('');
+            toast.success('Comment posted successfully', {
+              style: {
+                background: '#10b981',
+                color: '#fff'
+              }
+            });
+          },
+          onError: (error) => {
+            toast.error(error?.message || 'Failed to post comment', {
+              style: {
+                background: '#ef4444',
+                color: '#fff'
+              }
+            });
+          }
+        }
+      );
     }
   };
 
   const handlePostVote = (voteType) => {
     const value = voteType === 'up' ? 1 : -1;
-    castVoteOnPostMutation.mutate({ value });
+    castVoteOnPostMutation.mutate(
+      { value },
+      {
+        onSuccess: () => {
+          toast.success(`Post ${voteType === 'up' ? 'upvoted' : 'downvoted'} successfully`, {
+            style: {
+              background: '#10b981',
+              color: '#fff'
+            }
+          });
+        },
+        onError: (error) => {
+          toast.error(error?.message || 'Failed to vote on post', {
+            style: {
+              background: '#ef4444',
+              color: '#fff'
+            }
+          });
+        }
+      }
+    );
   };
 
   return (
@@ -120,7 +261,7 @@ const SinglePostPage = () => {
         <Stack spacing="lg">
           <PostComponent 
             post={post} 
-            onVote={handlePostVote} // Pass the vote handler to PostComponent
+            onVote={handlePostVote}
           />
           
           <Stack spacing="md">
@@ -140,10 +281,11 @@ const SinglePostPage = () => {
             <Card shadow="sm" radius="md" className="p-4 bg-white border border-gray-200">
               <Stack spacing="sm">
                 <Textarea
-                  placeholder="Write a comment..."
-                  minRows={3}
                   value={commentText}
                   onChange={(e) => setCommentText(e.target.value)}
+                  placeholder="Write a comment..."
+                  autosize
+                  minRows={2}
                   className="w-full"
                 />
                 <Button
