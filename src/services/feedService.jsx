@@ -115,6 +115,17 @@ const feedService = {
       throw new Error(error.response?.data?.error || 'Failed to cast vote');
     }
   },
+
+  toggleBestAnswer: async (commentId, token) => {
+    try {
+      const response = await axios.patch(`${API_URL}/api/post/comment/${commentId}/best`, {}, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.error || 'Failed to toggle best answer');
+    }
+  },
 };
 
 export default feedService;

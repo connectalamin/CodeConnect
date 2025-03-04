@@ -10,6 +10,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { useAuth } from '../hooks/useAuth';
 import feedService from '../services/feedService';
+import { Link } from 'react-router-dom';
 
 const MyPostsPage = () => {
   const { profile } = useProfile();
@@ -58,9 +59,11 @@ const MyPostsPage = () => {
               >
                 <Stack spacing="md">
                   <Group position="apart" className="flex items-center">
+                  <Link to={`/post/${post.id}`}>
                     <Text size="xl" weight={700} className="text-gray-900 line-clamp-1">
                       {post.title}
                     </Text>
+                  </Link>
                     <Group spacing="xs">
                       <ActionIcon
                         color="blue"
