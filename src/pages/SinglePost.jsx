@@ -18,6 +18,7 @@ import toast from 'react-hot-toast';
 
 const CommentCard = ({ comment, postId, isPostOwner, bestAnswerId }) => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const castVoteOnCommentMutation = useCastVoteOnComment(postId, comment.id);
   const editCommentMutation = useUpdateComment(comment.id);
   const deleteCommentMutation = useDeleteComment(postId, comment.id);
@@ -94,121 +95,126 @@ const CommentCard = ({ comment, postId, isPostOwner, bestAnswerId }) => {
   };
 
   return (
-<Card
-  key={comment.id}
-  shadow="lg"
-  radius="lg"
-  className={`p-4 bg-white border transition-all duration-300 hover:shadow-xl 
-    ${isBestAnswer 
-      ? 'border-2 border-[#f4c430] bg-gradient-to-br from-[#fffbeb] via-[#fef9c3] to-[#fef3c7] ' 
-      : 'border-gray-200 hover:border-[#94d2bd] hover:bg-gradient-to-br hover:from-white hover:via-[#f0f9eb] hover:to-[#d4e8d9]'}`
-  }
->
-  <Stack spacing="sm">
-    <Group position="apart">
-      <Group spacing="sm">
-        <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center ring-2 ring-[#94d2bd]/20">
-          <Text size="md" weight={600} color="gray-500" className="uppercase">
-            {comment.user?.name?.[0] || 'C'}
-          </Text>
-        </div>
-        <Stack spacing={0}>
-          <Group spacing="xs">
-            <Text size="sm" weight={600} color="gray-900">
-              {comment.user?.name || 'Unknown'}
-            </Text>
-            <Text
-              size="xs"
-              weight={700}
-              className="px-2 py-1 rounded-md bg-gradient-to-r from-[#d4af37] via-[#f4c430] to-[#d4af37] text-gray-900 shadow-lg border border-[#b8860b] transform transition-all hover:scale-105 hover:shadow-xl glow-effect"
+    <Card
+      key={comment.id}
+      shadow="lg"
+      radius="lg"
+      className={`p-4 bg-white border transition-all duration-300 hover:shadow-xl 
+        ${isBestAnswer 
+          ? 'border-2 border-[#f4c430] bg-gradient-to-br from-[#fffbeb] via-[#fef9c3] to-[#fef3c7]' 
+          : 'border-gray-200 hover:border-[#94d2bd] hover:bg-gradient-to-br hover:from-white hover:via-[#f0f9eb] hover:to-[#d4e8d9]'}`}
+    >
+      <Stack spacing="sm">
+        <Group position="apart">
+          <Group spacing="sm">
+            <div
+              className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center ring-2 ring-[#94d2bd]/20 cursor-pointer"
+              onClick={() => navigate(isCommentOwner ? '/profile/' : `/profile/${comment.user?.id}`)}
+
             >
-              {comment.user?.ranking || 'N/A'}
-            </Text>
+              <Text size="md" weight={600} color="gray-500" className="uppercase">
+                {comment.user?.name?.[0] || 'C'}
+              </Text>
+            </div>
+            <Stack spacing={0}>
+              <Group spacing="xs">
+                <Text
+                  size="sm"
+                  weight={600}
+                  color="gray-900"
+                  className="cursor-pointer"
+                  onClick={() => navigate(isCommentOwner ? '/profile/' : `/profile/${comment.user?.id}`)}
+
+                >
+                  {comment.user?.name || 'Unknown'}
+                </Text>
+                <Text
+                  size="xs"
+                  weight={700}
+                  className="px-2 py-1 rounded-md bg-gradient-to-r from-[#d4af37] via-[#f4c430] to-[#d4af37] text-gray-900 shadow-lg border border-[#b8860b] transform transition-all hover:scale-105 hover:shadow-xl glow-effect"
+                >
+                  {comment.user?.ranking || 'N/A'}
+                </Text>
+              </Group>
+              <Text size="xs" color="gray-500">
+                {comment.createdAt ? new Date(comment.createdAt).toLocaleString() : 'Unknown Date'}
+              </Text>
+            </Stack>
           </Group>
-          <Text size="xs" color="gray-500">
-            {comment.createdAt ? new Date(comment.createdAt).toLocaleString() : 'Unknown Date'}
-          </Text>
-        </Stack>
-      </Group>
-      {(isCommentOwner || isPostOwner) && (
-        <Menu shadow="md" width={200} withinPortal>
-          <Menu.Target>
-            <ActionIcon size="sm" variant="subtle" color="gray">
-              <CiMenuKebab color="black" />
-            </ActionIcon>
-          </Menu.Target>
-          <Menu.Dropdown>
-            {isCommentOwner && (
-              <Menu.Item onClick={() => setIsEditing(true)}>
-                Edit
-              </Menu.Item>
-            )}
-            {isCommentOwner && (
-              <Menu.Item color="red" onClick={handleDelete}>
-                Delete
-              </Menu.Item>
-            )}
-            {isPostOwner && (
-              <Menu.Item
-                color={isBestAnswer ? "orange" : "green"}
-                onClick={handleToggleBestAnswer}
-                icon={<CheckCircle size={14} />}
-              >
-                {isBestAnswer ? "Unmark as Best Answer" : "Mark as Best Answer"}
-              </Menu.Item>
-            )}
-          </Menu.Dropdown>
-        </Menu>
-      )}
-      {/* Add "Best Answer" text at the top-right corner if isBestAnswer is true */}
-      {isBestAnswer && (
-        <Text
-          className="absolute top-2 right-2 font-semibold bg-[#f4c430]  px-4 py-2 rounded-md shadow-lg w-28 text-center"
-          style={{ zIndex: 10 }}
-        >
-          Best Answer
-        </Text>
-      )}
-    </Group>
-    {isEditing ? (
-      <>
-        <Textarea
-          value={editedContent}
-          onChange={(e) => setEditedContent(e.target.value)}
-          placeholder="Edit your comment..."
-          autosize
-          minRows={2}
-        />
-        <Group position="right" mt="sm">
-          <Button onClick={handleEdit}>Save</Button>
-          <Button variant="outline" onClick={() => setIsEditing(false)}>Cancel</Button>
+          {(isCommentOwner || isPostOwner) && (
+            <Menu shadow="md" width={200} withinPortal>
+              <Menu.Target>
+                <ActionIcon size="sm" variant="subtle" color="gray">
+                  <CiMenuKebab color="black" />
+                </ActionIcon>
+              </Menu.Target>
+              <Menu.Dropdown>
+                {isCommentOwner && (
+                  <Menu.Item onClick={() => setIsEditing(true)}>
+                    Edit
+                  </Menu.Item>
+                )}
+                {isCommentOwner && (
+                  <Menu.Item color="red" onClick={handleDelete}>
+                    Delete
+                  </Menu.Item>
+                )}
+                {isPostOwner && (
+                  <Menu.Item
+                    color={isBestAnswer ? "orange" : "green"}
+                    onClick={handleToggleBestAnswer}
+                    icon={<CheckCircle size={14} />}
+                  >
+                    {isBestAnswer ? "Unmark as Best Answer" : "Mark as Best Answer"}
+                  </Menu.Item>
+                )}
+              </Menu.Dropdown>
+            </Menu>
+          )}
+          {isBestAnswer && (
+            <Text
+              className="absolute top-2 right-2 font-semibold bg-[#f4c430] px-4 py-2 rounded-md shadow-lg w-28 text-center"
+              style={{ zIndex: 10 }}
+            >
+              Best Answer
+            </Text>
+          )}
         </Group>
-      </>
-    ) : (
-      <Text size="sm" color="gray-700">
-        {comment.content || 'No content'}
-      </Text>
-    )}
-    <Group spacing="lg">
-      <Group spacing="xs">
-        <ActionIcon size="md" color="gray" radius="md" onClick={() => handleVote('up')}>
-          <Text size="sm">👍</Text>
-        </ActionIcon>
-        <Text size="xs" weight={500} color="gray-600">
-          {comment.upvotes || 0}
-        </Text>
-      </Group>
-      <Group spacing="xs">
-        <ActionIcon size="md" color="gray" radius="md" onClick={() => handleVote('down')}>
-          <Text size="sm">👎</Text>
-        </ActionIcon>
-        <Text size="xs" weight={500} color="gray-600">
-          {comment.downvotes || 0}
-        </Text>
-      </Group>
-    </Group>
-  </Stack>
-</Card>
+        {isEditing ? (
+          <>
+            <Textarea
+              value={editedContent}
+              onChange={(e) => setEditedContent(e.target.value)}
+              placeholder="Edit your comment..."
+              autosize
+              minRows={2}
+            />
+            <Group position="right" mt="sm">
+              <Button onClick={handleEdit}>Save</Button>
+              <Button variant="outline" onClick={() => setIsEditing(false)}>Cancel</Button>
+            </Group>
+          </>
+        ) : (
+          <Text size="sm" color="gray-700">
+            {comment.content || 'No content'}
+          </Text>
+        )}
+        <Group spacing="lg">
+          <Group spacing="xs">
+            <ActionIcon size="md" color="gray" radius="md" onClick={() => handleVote('up')}>
+              <Text size="sm">👍</Text>
+            </ActionIcon>
+            <Text size="xs" weight={500} color="gray-600">{comment.upvotes || 0}</Text>
+          </Group>
+          <Group spacing="xs">
+            <ActionIcon size="md" color="gray" radius="md" onClick={() => handleVote('down')}>
+              <Text size="sm">👎</Text>
+            </ActionIcon>
+            <Text size="xs" weight={500} color="gray-600">{comment.downvotes || 0}</Text>
+          </Group>
+        </Group>
+      </Stack>
+    </Card>
   );
 };
 
@@ -236,7 +242,7 @@ const SinglePostPage = () => {
   if (!post || !post.user) return <div>Post not found</div>;
 
   const isPostOwner = String(user?.id) === String(post.userId);
- 
+
   const handleCommentSubmit = () => {
     if (commentText.trim()) {
       createCommentMutation.mutate(
@@ -282,20 +288,17 @@ const SinglePostPage = () => {
       <Navbar />
       <Container size="xl" className="py-16 px-4 bg-gradient-to-br from-[#f0f9eb] to-[#d4e8d9] text-gray-800 rounded-3xl">
         <Stack spacing="lg">
-          <PostComponent 
-            post={post} 
-            onVote={handlePostVote}
-          />
+          <PostComponent post={post} onVote={handlePostVote} isPostOwner={isPostOwner}/>
           <Stack spacing="md">
             <Text size="lg" weight={700} className="text-gray-900">
               Comments
             </Text>
             {comments.length > 0 ? (
               comments.map((comment) => (
-                <CommentCard 
-                  key={comment.id} 
-                  comment={comment} 
-                  postId={postId} 
+                <CommentCard
+                  key={comment.id}
+                  comment={comment}
+                  postId={postId}
                   isPostOwner={isPostOwner}
                   bestAnswerId={post.bestAnswerId}
                 />
@@ -305,7 +308,6 @@ const SinglePostPage = () => {
                 No comments yet. Be the first to comment!
               </Text>
             )}
-
             <Card shadow="sm" radius="md" className="p-4 bg-white border border-gray-200">
               <Stack spacing="sm">
                 <Textarea

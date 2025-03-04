@@ -16,6 +16,7 @@ import Feed from "./pages/Feed";
 import MyPostsPage from "./pages/MyPostsPage";
 import MyCommentsPage from "./pages/MyCommentsPage";
 import SinglePostPage from "./pages/SinglePost";
+import UserProfile from "./pages/Profile";
 function App() {
   return (
     <AuthProvider>
@@ -69,6 +70,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Profile />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile/:userId"
+            element={
+              <ProtectedRoute>
+                <UserProfile />
               </ProtectedRoute>
             }
           />

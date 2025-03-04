@@ -16,7 +16,9 @@ const authService = {
       headers: { Authorization: `Bearer ${token}` },
     });
   },
-
+  getPublicProfile: async (userId) => {
+    return axios.get(`${API_URL}/api/users/${userId}`); // No token needed if public
+  },
   updateProfile: async (token, profileData) => {
     return axios.patch(`${API_URL}/api/profile`, profileData, {
       headers: { 

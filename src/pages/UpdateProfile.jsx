@@ -15,7 +15,6 @@ const UpdateProfile = () => {
   const { profile, refetchProfile } = useProfile();
   const [loading, setLoading] = useState(false);
 
-  // Initialize Mantine form
   const form = useForm({
     initialValues: {
       name: '',
@@ -30,7 +29,6 @@ const UpdateProfile = () => {
     },
   });
 
-  // Populate form with profile data when it loads
   useEffect(() => {
     if (profile?.user) {
       form.setValues({
@@ -45,10 +43,9 @@ const UpdateProfile = () => {
         expertise: profile.user.expertise || [],
       });
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profile]);
 
-  // Handle form submission
   const handleSubmit = async (values) => {
     setLoading(true);
     try {
@@ -80,10 +77,9 @@ const UpdateProfile = () => {
     }
   };
 
-  // Handle Tab key to add tags in MultiSelect
   const handleMultiSelectKeyDown = (event) => {
     if (event.key === 'Tab') {
-      event.preventDefault(); // Prevent default Tab behavior (focus shift)
+      event.preventDefault();
       const inputValue = event.target.value.trim();
       if (inputValue && !form.values.expertise.includes(inputValue)) {
         form.setFieldValue('expertise', [...form.values.expertise, inputValue]);
@@ -241,32 +237,31 @@ const UpdateProfile = () => {
                     },
                   }}
                 />
-                <MultiSelect
-                  label={<Text size="sm" color="gray.7" weight={600}>Expertise</Text>}
-                  placeholder="Add skills (e.g., React, Node.js) - Use Tab to add"
-                  searchable
-                  creatable
-                  getCreateLabel={(query) => `+ Add "${query}"`}
-                  radius="md"
-                  {...form.getInputProps('expertise')}
-                  onKeyDown={handleMultiSelectKeyDown} // Use Tab to add tags
-                  className="text-gray-600"
-                  styles={{
-                    input: {
-                      backgroundColor: 'rgba(240, 249, 235, 0.5)',
-                      borderColor: '#e2e8f0',
-                      '&:hover': { borderColor: '#94d2bd' },
-                    },
-                    dropdown: {
-                      backgroundColor: '#fff',
-                      borderColor: '#e2e8f0',
-                      boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                    },
-                    item: {
-                      '&:hover': { backgroundColor: '#f0f9eb', color: '#2d3748' },
-                    },
-                  }}
-                />
+              <MultiSelect
+  label={<Text size="sm" color="gray.7" weight={600}>Expertise</Text>}
+  placeholder="Add skills (e.g., React, Node.js) - Use Tab to add"
+  searchable
+  creatable="true"
+  radius="md"
+  {...form.getInputProps('expertise')}
+  onKeyDown={handleMultiSelectKeyDown}
+  className="text-gray-600"
+  styles={{
+    input: {
+      backgroundColor: 'rgba(240, 249, 235, 0.5)',
+      borderColor: '#e2e8f0',
+      '&:hover': { borderColor: '#94d2bd' },
+    },
+    dropdown: {
+      backgroundColor: '#fff',
+      borderColor: '#e2e8f0',
+      boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+    },
+    item: {
+      '&:hover': { backgroundColor: '#f0f9eb', color: '#2d3748' },
+    },
+  }}
+/>
                 <Button
                   type="submit"
                   fullWidth

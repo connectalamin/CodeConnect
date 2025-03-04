@@ -1,6 +1,6 @@
 /* eslint-disable no-useless-escape */
 import { Card, Text, Stack, Badge, Group, ActionIcon } from '@mantine/core';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useCastVoteOnPost } from '../../hooks/useCastVoteOnPost';
 import { useEffect, useState } from 'react';
 import hljs from 'highlight.js';
@@ -10,8 +10,9 @@ hljs.configure({
   languages: ['javascript', 'typescript', 'python', 'java', 'cpp', 'css', 'html', 'json'],
 });
 
-const PostComponent = ({ post, onVote }) => {
+const PostComponent = ({ post, onVote,isPostOwner }) => {
   const castVoteOnPostMutation = useCastVoteOnPost(post.id);
+  const navigate = useNavigate();
   const [highlightedContent, setHighlightedContent] = useState('');
   const [isCode, setIsCode] = useState(false);
 
@@ -51,7 +52,7 @@ const PostComponent = ({ post, onVote }) => {
   const handlePostVote = (voteType) => {
     const value = voteType === 'up' ? 1 : -1;
     if (onVote) {
-      onVote(voteType); // Call the parent handler if provided
+      onVote(voteType);
     } else {
       castVoteOnPostMutation.mutate({ value });
     }
@@ -64,10 +65,13 @@ const PostComponent = ({ post, onVote }) => {
       className="p-5 bg-gradient-to-b from-white to-gray-50 border border-gray-200 transition-all duration-300 hover:shadow-xl hover:border-[#94d2bd]"
     >
       <Stack spacing="md">
-        {/* Header: Display author, post date, and category */}
         <Group position="apart" className="flex items-center">
           <Group spacing="sm">
-            <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center ring-2 ring-[#94d2bd]/20 hover:ring-[#94d2bd]/40 transition-all duration-300">
+            <div
+              className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center ring-2 ring-[#94d2bd]/20 hover:ring-[#94d2bd]/40 transition-all duration-300 cursor-pointer"
+              
+              onClick={() => navigate(isPostOwner ? '/profile/' : `/profile/${post.userId}`)}
+            >
               {post.user.image ? (
                 <img
                   src={post.user.image}
@@ -81,7 +85,13 @@ const PostComponent = ({ post, onVote }) => {
               )}
             </div>
             <Stack spacing={0}>
-              <Text size="md" weight={600} color="gray-900" className="line-clamp-1">
+              <Text
+                size="md"
+                weight={600}
+                color="gray-900"
+                className="line-clamp-1 cursor-pointer"
+                onClick={() => navigate(isPostOwner ? '/profile/' : `/profile/${post.userId}`)}
+              >
                 {post.user.name}
               </Text>
               <Text size="xs" color="gray-500" className="line-clamp-1">
@@ -97,23 +107,17 @@ const PostComponent = ({ post, onVote }) => {
             {post.category}
           </Badge>
         </Group>
-
-        {/* Content: Display post title and content */}
         <Stack spacing="sm">
           <Text size="xl" weight={700} className="text-gray-900 line-clamp-1">
             {post.title}
           </Text>
-          
           {isCode ? (
             <div className="rounded-md overflow-hidden bg-gray-900 text-white">
               <div className="p-2 bg-gray-800 text-gray-300 text-sm font-mono border-b border-gray-700">
                 Code
               </div>
               <pre className="p-4 overflow-auto" style={{ maxHeight: '250px' }}>
-                <code 
-                  className="hljs language-javascript"
-                  dangerouslySetInnerHTML={{ __html: highlightedContent }} 
-                />
+                <code className="hljs language-javascript" dangerouslySetInnerHTML={{ __html: highlightedContent }} />
               </pre>
             </div>
           ) : (
@@ -122,24 +126,18 @@ const PostComponent = ({ post, onVote }) => {
             </Text>
           )}
         </Stack>
-
-        {/* Footer: Voting and interaction */}
         <Group spacing="lg" className="mt-3">
           <Group spacing="xs">
             <ActionIcon size="lg" color="gray" radius="md" onClick={() => handlePostVote('up')}>
               <Text size="md">👍</Text>
             </ActionIcon>
-            <Text size="sm" weight={500} color="gray-600">
-              {post.upvotes}
-            </Text>
+            <Text size="sm" weight={500} color="gray-600">{post.upvotes}</Text>
           </Group>
           <Group spacing="xs">
             <ActionIcon size="lg" color="gray" radius="md" onClick={() => handlePostVote('down')}>
               <Text size="md">👎</Text>
             </ActionIcon>
-            <Text size="sm" weight={500} color="gray-600">
-              {post.downvotes}
-            </Text>
+            <Text size="sm" weight={500} color="gray-600">{post.downvotes}</Text>
           </Group>
           <Group spacing="xs">
             {post.id ? (
@@ -153,9 +151,7 @@ const PostComponent = ({ post, onVote }) => {
                 <Text size="md">💬</Text>
               </ActionIcon>
             )}
-            <Text size="sm" weight={500} color="gray-600">
-              {post.comments?.length || 0}
-            </Text>
+            <Text size="sm" weight={500} color="gray-600">{post.comments?.length || 0}</Text>
           </Group>
         </Group>
       </Stack>

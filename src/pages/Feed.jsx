@@ -10,11 +10,12 @@ import AddPostComponent from '../components/Feed/AddPostComponent';
 import { FaStar } from 'react-icons/fa';
 import HashLoader from 'react-spinners/HashLoader';
 import toast from 'react-hot-toast';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const FeedPage = () => {
   const { profile } = useProfile();
   const { posts, isLoading, isError, error } = usePost();
+  const navigate = useNavigate();
   const [opened, setOpened] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDateRange, setSelectedDateRange] = useState('All time');
@@ -128,9 +129,7 @@ const FeedPage = () => {
               Add Post
             </Button>
           </div>
-
           <SearchComponent searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
-
           <Grid gutter="lg">
             <Grid.Col span={3}>
               <Card
@@ -139,7 +138,10 @@ const FeedPage = () => {
                 className="p-6 bg-gradient-to-b from-white to-gray-50 border border-gray-200 transition-all duration-300 hover:shadow-xl hover:border-[#94d2bd]"
               >
                 <div className="flex flex-col items-center space-y-5">
-                  <div className="relative w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden ring-4 ring-[#94d2bd]/20 hover:ring-[#94d2bd]/50 transition-all duration-300">
+                  <div
+                    className="relative w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden ring-4 ring-[#94d2bd]/20 hover:ring-[#94d2bd]/50 transition-all duration-300 cursor-pointer"
+                    onClick={() => navigate(`/profile/${profile?.user?.id}`)}
+                  >
                     {profile?.user?.image ? (
                       <img
                         src={profile?.user?.image}
@@ -162,7 +164,8 @@ const FeedPage = () => {
                       <Text
                         size="lg"
                         weight={700}
-                        className="text-gray-900 truncate max-w-full bg-gray-100/50 px-3 py-1 rounded-full"
+                        className="text-gray-900 truncate max-w-full bg-gray-100/50 px-3 py-1 rounded-full cursor-pointer"
+                        onClick={() => navigate(`/profile/${profile?.user?.id}`)}
                       >
                         {profile?.user?.name || 'Unnamed User'}
                       </Text>
@@ -199,7 +202,6 @@ const FeedPage = () => {
                 </div>
               </Card>
             </Grid.Col>
-
             <Grid.Col span={6}>
               <div className="space-y-6">
                 <div className="space-y-4">
@@ -238,7 +240,6 @@ const FeedPage = () => {
                 </div>
               </div>
             </Grid.Col>
-
             <Grid.Col span={3}>
               <Stack spacing="lg">
                 <FilterComponent
@@ -249,7 +250,6 @@ const FeedPage = () => {
                   selectedSort={selectedSort}
                   setSelectedSort={setSelectedSort}
                 />
-
                 <Card
                   shadow="md"
                   radius="xl"
@@ -260,7 +260,6 @@ const FeedPage = () => {
                       <Tabs.Tab value="posts">My Posts</Tabs.Tab>
                       <Tabs.Tab value="comments">My Comments</Tabs.Tab>
                     </Tabs.List>
-
                     <Tabs.Panel value="posts" pt="xs">
                       <Stack spacing="sm" className="max-h-60 overflow-y-auto">
                         {myPosts.slice(0, visiblePosts).map((post) => (
@@ -291,7 +290,6 @@ const FeedPage = () => {
                         )}
                       </Stack>
                     </Tabs.Panel>
-
                     <Tabs.Panel value="comments" pt="xs">
                       <Stack spacing="sm" className="max-h-60 overflow-y-auto">
                         {myComments.slice(0, visibleComments).map((comment, index) => (
@@ -327,7 +325,6 @@ const FeedPage = () => {
               </Stack>
             </Grid.Col>
           </Grid>
-
           <AddPostComponent
             opened={opened}
             onClose={() => {
