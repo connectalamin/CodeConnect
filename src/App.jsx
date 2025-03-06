@@ -19,7 +19,7 @@ import SinglePostPage from "./pages/SinglePost";
 import UserProfile from "./pages/Profile";
 function App() {
   return (
-    <AuthProvider>
+  <>
       <Toaster
         position="top-center"
         toastOptions={{
@@ -39,6 +39,7 @@ function App() {
         }}
       />
       <Router>
+        <AuthProvider>
         <Routes>
           <Route
             path="/login"
@@ -124,8 +125,9 @@ function App() {
           <Route path="/empty" element={<Error />} />
           <Route path="*" element={<NotFound />} /> {/* Catch-all for 404 */}
         </Routes>
+        </AuthProvider>
       </Router>
-    </AuthProvider>
+    </>
   );
 }
 export default App;

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-useless-escape */
 import { Card, Text, Stack, Badge, Group, ActionIcon } from '@mantine/core';
 import { Link, useNavigate } from 'react-router-dom';
