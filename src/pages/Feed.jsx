@@ -26,9 +26,7 @@ const FeedPage = () => {
   const [visibleComments, setVisibleComments] = useState(5);
   const postsPerPage = 3;
 
-  useEffect(() => {
-    console.log('Posts in FeedPage:', posts);
-  }, [posts]);
+
 
   useEffect(() => {
     setCurrentPage(1);
@@ -60,16 +58,17 @@ const FeedPage = () => {
           return true;
       }
     });
-    console.log('Filtered by date:', filtered);
+  
     return filtered;
   };
 
   const filteredPosts = filterPostsByDate(posts).filter((post) =>
     (post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      post.category?.toLowerCase().includes(searchTerm.toLowerCase())) &&
-    (selectedCategory ? post.category?.toLowerCase() === selectedCategory.toLowerCase() : true)
+      // CHANGED: Added check for category name in search and fixed category comparison
+      (post.category?.name?.toLowerCase().includes(searchTerm.toLowerCase()) || false)) &&
+    // CHANGED: Modified category filter to handle 'all' case and proper comparison
+    (selectedCategory === 'all' || !selectedCategory ? true : post.categoryId?.toString() === selectedCategory)
   );
-  console.log('Filtered posts:', filteredPosts);
 
   const sortedPosts = filteredPosts.sort((a, b) => {
     if (selectedSort === 'Top') {
@@ -78,12 +77,12 @@ const FeedPage = () => {
       return new Date(b.createdAt) - new Date(a.createdAt);
     }
   });
-  console.log('Sorted posts:', sortedPosts);
+
 
   const indexOfLastPost = currentPage * postsPerPage;
   const indexOfFirstPost = indexOfLastPost - postsPerPage;
   const currentPosts = sortedPosts.slice(indexOfFirstPost, indexOfLastPost);
-  console.log('Current posts:', currentPosts, 'Page:', currentPage, 'Indices:', indexOfFirstPost, indexOfLastPost);
+
 
   const totalPages = Math.ceil(sortedPosts.length / postsPerPage);
 

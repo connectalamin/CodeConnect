@@ -1,74 +1,62 @@
-import { TextInput, Button, PasswordInput, Stack, Text } from "@mantine/core";
-import { IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
-import { Link, useNavigate, useLocation } from "react-router-dom";
-import { useAuth } from "../../hooks/useAuth";
-import HashLoader from "react-spinners/HashLoader";
-import { useState } from "react";
-import { toast } from "react-hot-toast";
+// filepath: h:\Academic\CodeConnect\CodeConnect_Client\src\auth\pages\Login.jsx
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../hooks/useAuth';
+import { toast } from 'react-hot-toast';
+import { useState } from 'react';
+import { TextInput, Button, PasswordInput, Stack, Text } from '@mantine/core';
+import { IoEyeOutline, IoEyeOffOutline } from 'react-icons/io5';
+import { Link } from 'react-router-dom';
+import HashLoader from 'react-spinners/HashLoader';
 
 const Login = () => {
-  const [user, setUser] = useState({
-    email: "",
-    password: "",
-  });
-  const [error, setError] = useState("");
+  const [credentials, setCredentials] = useState({ email: '', password: '' });
+  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
-
-  const location = useLocation();
   const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setUser({
-      ...user,
-      [name]: value,
-    });
+    setCredentials({ ...credentials, [name]: value });
   };
-  // ...existing code...
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Add validation
-    if (!user.email || !user.password) {
-      toast.error("Please fill in all fields");
+    if (!credentials.email || !credentials.password) {
+      toast.error('Please fill in all fields');
       return;
     }
-
     try {
-      setError("");
+      setError('');
       setLoading(true);
-      await login(user);
-      toast.success("Login successful!");
-      navigate(location.state?.from || "/feed");
+      const user = await login(credentials);
+      if (user.role === 'ADMIN') {
+        navigate('/admin');
+      } else {
+        navigate('/feed');
+      }
+      toast.success('Login successful!');
     } catch (error) {
       if (error.response) {
-        // Server responded with error
         switch (error.response.status) {
           case 401:
-            toast.error("Invalid email or password");
+            toast.error('Invalid email or password');
             break;
           case 404:
-            toast.error("Account not found");
+            toast.error('Account not found');
             break;
           case 500:
-            toast.error("Server error. Please try again later");
+            toast.error('Server error. Please try again later');
             break;
           default:
-            toast.error(
-              error.response.data.message || "Login failed. Please try again"
-            );
+            toast.error(error.response.data.message || 'Login failed. Please try again');
         }
       } else if (error.request) {
-        // Network error
-        toast.error(
-          "Unable to connect to server. Please check your internet connection"
-        );
+        toast.error('Unable to connect to server. Please check your internet connection');
       } else {
-        // Other errors
-        toast.error("An unexpected error occurred. Please try again");
+        toast.error('An unexpected error occurred. Please try again');
       }
-      console.error("Login error:", error);
+      console.error('Login error:', error);
     } finally {
       setLoading(false);
     }
@@ -97,39 +85,32 @@ const Login = () => {
                   placeholder="you@codeconnect.com"
                   withAsterisk
                   variant="filled"
-                  value={user.email}
+                  value={credentials.email}
                   type="email"
                   name="email"
                   onChange={handleChange}
                   classNames={{
-                    input:
-                      "border-gray-200 focus:border-[#7ed957] transition-colors duration-300",
-                    label: "text-gray-700 font-medium",
+                    input: 'border-gray-200 focus:border-[#7ed957] transition-colors duration-300',
+                    label: 'text-gray-700 font-medium',
                   }}
                 />
                 <PasswordInput
                   label="Password"
                   placeholder="Enter your password"
-                  value={user.password}
+                  value={credentials.password}
                   onChange={handleChange}
                   type="password"
                   name="password"
                   visibilityToggleIcon={({ reveal }) =>
-                    reveal ? (
-                      <IoEyeOutline size={20} color="#7ed957" />
-                    ) : (
-                      <IoEyeOffOutline size={20} color="#7ed957" />
-                    )
+                    reveal ? <IoEyeOutline size={20} color="#7ed957" /> : <IoEyeOffOutline size={20} color="#7ed957" />
                   }
                   withAsterisk
                   variant="filled"
                   classNames={{
-                    input:
-                      "border-gray-200 focus:border-[#7ed957] transition-colors duration-300",
-                    label: "text-gray-700 font-medium",
+                    input: 'border-gray-200 focus:border-[#7ed957] transition-colors duration-300',
+                    label: 'text-gray-700 font-medium',
                   }}
                 />
-
                 <Button
                   type="submit"
                   fullWidth
@@ -141,11 +122,8 @@ const Login = () => {
               </Stack>
             </form>
             <Text size="sm" align="center" color="gray">
-              Don’t have an account?{" "}
-              <Link
-                to="/signup"
-                className="text-[#7ed957] font-medium cursor-pointer hover:underline"
-              >
+              Don’t have an account?{' '}
+              <Link to="/signup" className="text-[#7ed957] font-medium cursor-pointer hover:underline">
                 Sign Up
               </Link>
             </Text>

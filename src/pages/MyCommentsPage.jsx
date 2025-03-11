@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useProfile } from '../hooks/useProfile';
@@ -21,7 +22,9 @@ const MyCommentsPage = () => {
   if (!profile?.user?.id) {
     return (
       <div className="flex justify-center items-center h-screen">
-        <Text size="md" color="gray-600">Please log in to view your comments.</Text>
+        <Text size="md" color="gray-600">
+          Please log in to view your comments.
+        </Text>
       </div>
     );
   }
@@ -36,8 +39,10 @@ const MyCommentsPage = () => {
 
   // Group comments by post ID to find unique posts where the user commented
   const commentsByPost = {};
-  posts.forEach(post => {
-    const userComments = (post.comments || []).filter(comment => comment.userId === profile.user.id);
+  posts.forEach((post) => {
+    const userComments = (post.comments || []).filter(
+      (comment) => comment.userId === profile.user.id
+    );
     if (userComments.length > 0) {
       commentsByPost[post.id] = {
         postTitle: post.title || 'Untitled Post',
@@ -47,20 +52,25 @@ const MyCommentsPage = () => {
   });
 
   // Create list of unique posts with comments
-  const uniquePostsWithComments = Object.entries(commentsByPost).map(([postId, { postTitle, comments }]) => ({
-    postId: parseInt(postId),
-    postTitle,
-    comments,
-  }));
+  const uniquePostsWithComments = Object.entries(commentsByPost).map(
+    ([postId, { postTitle, comments }]) => ({
+      postId: parseInt(postId),
+      postTitle,
+      comments,
+    })
+  );
 
   const handleShowMoreComments = () => {
-    setVisibleComments(prev => prev + 5);
+    setVisibleComments((prev) => prev + 5);
   };
 
   return (
     <>
       <Navbar />
-      <Container size="xl" className="py-16 px-4 bg-gradient-to-br from-[#f0f9eb] to-[#d4e8d9] text-gray-800 rounded-3xl">
+      <Container
+        size="xl"
+        className="py-16 px-4 bg-gradient-to-br from-[#f0f9eb] to-[#d4e8d9] text-gray-800 rounded-3xl"
+      >
         <Stack spacing="lg">
           <Text size="xl" weight={900} className="text-gray-900">
             My Comments
@@ -72,39 +82,46 @@ const MyCommentsPage = () => {
             </Text>
           ) : (
             <Stack spacing="md">
-              {uniquePostsWithComments.slice(0, visibleComments).map(({ postId, postTitle, comments }) => (
-                <Card
-                  key={postId}
-                  shadow="md"
-                  radius="xl"
-                  className="p-4 bg-white border border-gray-200 transition-all duration-300 hover:shadow-xl hover:border-[#94d2bd]"
-                >
-                  <Link to={`/post/${postId}`} className="no-underline">
-                    <Text size="lg" weight={700} color="gray-900" className="hover:text-[#94d2bd] transition-colors duration-200">
-                      {postTitle}
-                    </Text>
-                  </Link>
-                  <Stack spacing="sm" mt="sm">
-                    {comments.map(comment => (
-                      <Card
-                        key={comment.id}
-                        shadow="sm"
-                        radius="md"
-                        className="p-4 bg-gray-50 border border-gray-200"
+              {uniquePostsWithComments
+                .slice(0, visibleComments)
+                .map(({ postId, postTitle, comments }) => (
+                  <Card
+                    key={postId}
+                    shadow="md"
+                    radius="xl"
+                    className="p-4 bg-white border border-gray-200 transition-all duration-300 hover:shadow-xl hover:border-[#94d2bd]"
+                  >
+                    <Link to={`/post/${postId}`} className="no-underline">
+                      <Text
+                        size="lg"
+                        weight={700}
+                        color="gray-900"
+                        className="hover:text-[#94d2bd] transition-colors duration-200"
                       >
-                        <Text size="sm" color="gray-700">
-                          {comment.content}
-                        </Text>
-                        <Group spacing="xs" mt="xs">
-                          <Text size="xs" color="gray-500">
-                            {new Date(comment.createdAt).toLocaleString()}
+                        {postTitle}
+                      </Text>
+                    </Link>
+                    <Stack spacing="sm" mt="sm">
+                      {comments.map((comment) => (
+                        <Card
+                          key={comment.id}
+                          shadow="sm"
+                          radius="md"
+                          className="p-4 bg-gray-50 border border-gray-200"
+                        >
+                          <Text size="sm" color="gray-700">
+                            {comment.content}
                           </Text>
-                        </Group>
-                      </Card>
-                    ))}
-                  </Stack>
-                </Card>
-              ))}
+                          <Group spacing="xs" mt="xs">
+                            <Text size="xs" color="gray-500">
+                              {new Date(comment.createdAt).toLocaleString()}
+                            </Text>
+                          </Group>
+                        </Card>
+                      ))}
+                    </Stack>
+                  </Card>
+                ))}
               {visibleComments < uniquePostsWithComments.length && (
                 <div className="flex justify-center">
                   <Button

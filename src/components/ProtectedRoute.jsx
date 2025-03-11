@@ -1,22 +1,33 @@
-import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import toast from 'react-hot-toast';
-const ProtectedRoute = ({ children }) => {
-  const { isAuthenticated, token } = useAuth(); // Destructure token for debugging
-  const location = useLocation();
+import RedirectWithToast from './RedirectWithToast';
+import { useEffect, useState } from 'react';
 
-  const authenticated = isAuthenticated();
-  console.log('ProtectedRoute - Authenticated:', authenticated, 'Token:', token, 'Path:', location.pathname);
+const ProtectedRoute = ({ children, adminOnly = false }) => {
+  const { isAuthenticated, role } = useAuth();
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+  
+  useEffect(() => {
+    // Short timeout to ensure auth state is fully loaded
+    const timer = setTimeout(() => {
+      setIsCheckingAuth(false);
+    }, 100);
+    
+    return () => clearTimeout(timer);
+  }, []);
+  
+  // Show nothing while checking auth state
+  if (isCheckingAuth) {
+    return null;
+  }
+  
+  if (!isAuthenticated()) {
+    return <RedirectWithToast to="/login" message="Please log in" />;
+  }
 
-  if (!authenticated) {
-    toast.error('You must be logged in to view this page');
-    return (
-      <Navigate
-        to="/login"
-        replace
-        state={{ from: location.pathname }}
-      />
-    );
+  // Case-insensitive comparison for role
+  if (adminOnly && role?.toUpperCase() !== 'ADMIN') {
+
+    return <RedirectWithToast to="/feed" message="Admin access required" />;
   }
 
   return children;

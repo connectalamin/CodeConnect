@@ -1,3 +1,4 @@
+// src/components/AddPostComponent.jsx
 import { useState, useEffect } from 'react';
 import { Modal, Stack, TextInput, Select, Button, Text, LoadingOverlay } from '@mantine/core';
 import hljs from 'highlight.js';
@@ -7,6 +8,7 @@ import feedService from '../../services/feedService';
 import { useForm } from '@mantine/form';
 import { useQueryClient } from '@tanstack/react-query';
 import 'highlight.js/styles/github-dark.css';
+import { useCategoryManagement } from '../../hooks/useCategoryManagement';
 
 hljs.configure({
   languages: ['javascript', 'typescript', 'python', 'java', 'cpp', 'css', 'html', 'json'],
@@ -15,6 +17,7 @@ hljs.configure({
 const AddPostComponent = ({ opened, onClose, postToEdit = null }) => {
   const { token } = useAuth();
   const queryClient = useQueryClient();
+  const { categories, isLoading: categoriesLoading, error: categoriesError } = useCategoryManagement();
   const [loading, setLoading] = useState(false);
   const [highlightedCode, setHighlightedCode] = useState('');
 
@@ -38,7 +41,7 @@ const AddPostComponent = ({ opened, onClose, postToEdit = null }) => {
       form.setValues({
         title: postToEdit.title,
         content: postToEdit.content,
-        category: postToEdit.category,
+        categoryId: postToEdit.category,
       });
       handleCodeHighlight(postToEdit.content);
     }
@@ -50,22 +53,21 @@ const AddPostComponent = ({ opened, onClose, postToEdit = null }) => {
       const postData = {
         title: values.title,
         content: values.content,
-        category: values.category,
+        categoryId: values.category,
       };
 
       if (isEditing) {
-        console.log('Updating post:', postToEdit.id, postData);
+
         await feedService.updatePost(postToEdit.id, postData, token);
         toast.success('Post updated successfully!');
       } else {
-        console.log('Creating post:', postData);
+    
         await feedService.createPost(postData, token);
         toast.success('Post created successfully!');
       }
 
-      // Invalidate and refetch posts
       await queryClient.invalidateQueries(['posts', token], { refetch: true });
-      console.log('Posts query invalidated');
+  
       onClose();
       form.reset();
       setHighlightedCode('');
@@ -82,6 +84,13 @@ const AddPostComponent = ({ opened, onClose, postToEdit = null }) => {
     setHighlightedCode(highlighted);
   };
 
+  // Transform categories into the format expected by Mantine's Select
+  const categoryOptions = categories?.map((category) => ({
+    value: category.id.toString(), // Use ID as value for uniqueness
+    label: category.name,
+
+  })) || [];
+
   return (
     <Modal
       opened={opened}
@@ -96,7 +105,7 @@ const AddPostComponent = ({ opened, onClose, postToEdit = null }) => {
       className="bg-gradient-to-b from-white to-gray-50"
       overlayProps={{ blur: 3 }}
     >
-      <LoadingOverlay visible={loading} overlayBlur={2} />
+      <LoadingOverlay visible={loading || categoriesLoading} overlayblur={2} />
       <form onSubmit={form.onSubmit(handleSubmit)}>
         <Stack spacing="md">
           <TextInput
@@ -155,11 +164,15 @@ const AddPostComponent = ({ opened, onClose, postToEdit = null }) => {
 
           <Select
             label={<Text size="sm" weight={500} color="gray-700">Category</Text>}
-            placeholder="Select category"
-            data={['Technology', 'Education', 'Health', 'Other']}
+            placeholder={categoriesLoading ? 'Loading categories...' : 'Select category'}
+            data={categoryOptions}
             radius="lg"
             {...form.getInputProps('category')}
             className="w-full"
+            disabled={categoriesLoading || !!categoriesError}
+            searchable
+            nothingfound="No categories available"
+            error={categoriesError ? 'Failed to load categories' : null}
             styles={{
               input: {
                 backgroundColor: '#ffffff',
@@ -175,7 +188,7 @@ const AddPostComponent = ({ opened, onClose, postToEdit = null }) => {
             type="submit"
             radius="lg"
             className="bg-[#94d2bd] text-white hover:bg-[#7cb8a4] transition-colors duration-300 shadow-md hover:shadow-lg w-full"
-            disabled={loading}
+            disabled={loading || categoriesLoading || !!categoriesError}
           >
             {loading ? (isEditing ? 'Updating...' : 'Creating...') : (isEditing ? 'Update Post' : 'Create Post')}
           </Button>

@@ -3,17 +3,18 @@ import { useAuth } from '../hooks/useAuth';
 import PropTypes from 'prop-types';
 
 const PublicRoute = ({ children }) => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, role } = useAuth();
 
   if (isAuthenticated()) {
-    return <Navigate to="/profile" replace />;
+    const redirectTo = role === 'ADMIN' ? '/admin' : '/feed';
+    return <Navigate to={redirectTo} replace />;
   }
 
   return children;
 };
 
 PublicRoute.propTypes = {
-  children: PropTypes.node.isRequired
+  children: PropTypes.node.isRequired,
 };
 
 export default PublicRoute;

@@ -22,9 +22,9 @@ export const usePost = (page = 1, pageSize = 3) => {
       }
 
       try {
-        console.log('Fetching posts with token:', token, 'page:', page, 'pageSize:', pageSize);
+       
         const response = await feedService.getAllPosts(token, page, pageSize);
-        console.log('Posts fetched:', response);
+     
         return response;
       } catch (err) {
         console.error('Fetch error:', err);

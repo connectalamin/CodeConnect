@@ -1,22 +1,54 @@
-import { FaReact, FaJs, FaCss3, FaHtml5, FaGit, FaNodeJs } from 'react-icons/fa'; // Example tech icons
-import { SiTailwindcss, SiVite, SiPrisma, SiPostgresql, SiExpress } from 'react-icons/si'; // Added new tech icons
+import {
+  FaReact,
+  FaJs,
+  FaCss3,
+  FaHtml5,
+  FaGit,
+  FaNodeJs,
+} from 'react-icons/fa'; // Example tech icons
+import {
+  SiTailwindcss,
+  SiVite,
+  SiPrisma,
+  SiPostgresql,
+  SiExpress,
+} from 'react-icons/si'; // Added new tech icons
 import Logo from '../assets/CodeConnect.svg';
 import aboutgif from '../assets/aboutme.gif'; // Placeholder for illustration, replace with your GIF path
 import Navbar from '../components/Navbar';
+import React from 'react';
 
 const About = () => {
   const technologies = [
     { name: 'React', icon: <FaReact className="text-blue-500" size={24} /> },
-    { name: 'Tailwind CSS', icon: <SiTailwindcss className="text-teal-500" size={24} /> },
-    { name: 'JavaScript', icon: <FaJs className="text-yellow-500" size={24} /> },
+    {
+      name: 'Tailwind CSS',
+      icon: <SiTailwindcss className="text-teal-500" size={24} />,
+    },
+    {
+      name: 'JavaScript',
+      icon: <FaJs className="text-yellow-500" size={24} />,
+    },
     { name: 'HTML5', icon: <FaHtml5 className="text-orange-500" size={24} /> },
     { name: 'CSS3', icon: <FaCss3 className="text-blue-400" size={24} /> },
     { name: 'Git', icon: <FaGit className="text-red-500" size={24} /> },
-    { name: 'Node.js', icon: <FaNodeJs className="text-green-500" size={24} /> },
+    {
+      name: 'Node.js',
+      icon: <FaNodeJs className="text-green-500" size={24} />,
+    },
     { name: 'Vite', icon: <SiVite className="text-purple-500" size={24} /> },
-    { name: 'Prisma', icon: <SiPrisma className="text-purple-600" size={24} /> }, // Prisma icon
-    { name: 'PostgreSQL', icon: <SiPostgresql className="text-blue-600" size={24} /> }, // PostgreSQL elephant
-    { name: 'Express', icon: <SiExpress className="text-gray-800" size={24} /> }, // Express icon
+    {
+      name: 'Prisma',
+      icon: <SiPrisma className="text-purple-600" size={24} />,
+    }, // Prisma icon
+    {
+      name: 'PostgreSQL',
+      icon: <SiPostgresql className="text-blue-600" size={24} />,
+    }, // PostgreSQL elephant
+    {
+      name: 'Express',
+      icon: <SiExpress className="text-gray-800" size={24} />,
+    }, // Express icon
   ];
 
   return (
@@ -35,17 +67,25 @@ const About = () => {
               About CodeConnect
             </h1>
             <p className="text-lg text-gray-600 mb-6">
-              <span className='font-semibold text-[#5caa3b] '>CodeConnect</span> is your hub for developer,student,teacher collaboration, designed to help you <span className='text-[#5caa3b]  font-semibold'>debug smarter, not harder.</span>
+              <span className="font-semibold text-[#5caa3b] ">CodeConnect</span>{' '}
+              is your hub for developer,student,teacher collaboration, designed
+              to help you{' '}
+              <span className="text-[#5caa3b]  font-semibold">
+                debug smarter, not harder.
+              </span>
             </p>
 
             {/* Made by Alamin */}
             <div className="mb-6">
               <h2 className="text-xl font-semibold text-gray-700 mb-2">
-                Made by Alamin <span className='text-[12px] text-[#5caa3b]' >(Session 2020-2021)</span>
+                Made by Alamin{' '}
+                <span className="text-[12px] text-[#5caa3b]">
+                  (Session 2020-2021)
+                </span>
               </h2>
               <p className="text-gray-600">
-            
-                Crafted with passion by Alamin as a semester project to empower the developer community of comilla university.
+                Crafted with passion by Alamin as a semester project to empower
+                the developer community of comilla university.
               </p>
             </div>
 
@@ -75,7 +115,11 @@ const About = () => {
                 As a Semester Project
               </h2>
               <p className="text-gray-600">
-                Developed as part of an academic semester, <span className='font-semibold text-[#5caa3b] '>CodeConnect</span> showcases innovative solutions for tech collaboration.
+                Developed as part of an academic semester,{' '}
+                <span className="font-semibold text-[#5caa3b] ">
+                  CodeConnect
+                </span>{' '}
+                showcases innovative solutions for tech collaboration.
               </p>
             </div>
           </div>

@@ -1,4 +1,12 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+// filepath: h:\Academic\CodeConnect\CodeConnect_Client\src\App.jsx
+// src/App.jsx
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+import { useState, useEffect } from "react";
 import Login from "./auth/pages/Login";
 import Signup from "./auth/pages/Signup";
 import Home from "./pages/Home";
@@ -17,9 +25,31 @@ import MyPostsPage from "./pages/MyPostsPage";
 import MyCommentsPage from "./pages/MyCommentsPage";
 import SinglePostPage from "./pages/SinglePost";
 import UserProfile from "./pages/Profile";
+import UserManagement from "./pages/UserManagement";
+import CategoryManagement from "./pages/CategoryManagement";
+import Admin from "./pages/Admin";
+
 function App() {
+  const [authReady, setAuthReady] = useState(false);
+
+  useEffect(() => {
+    // Allow time for token to be processed
+    const timer = setTimeout(() => {
+      setAuthReady(true);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (!authReady) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        Loading...
+      </div>
+    );
+  }
   return (
-  <>
+    <>
       <Toaster
         position="top-center"
         toastOptions={{
@@ -40,94 +70,108 @@ function App() {
       />
       <Router>
         <AuthProvider>
-        <Routes>
-          <Route
-            path="/login"
-            element={
-              <PublicRoute>
-                <Login />
-              </PublicRoute>
-            }
-          />
-          <Route
-            path="/signup"
-            element={
-              <PublicRoute>
-                <Signup />
-              </PublicRoute>
-            }
-          />
-          <Route
-            path="/"
-            element={
-              <PublicRoute>
-                <Home />
-              </PublicRoute>
-            }
-          />
-          <Route path="/about" element={<About />} />
-          <Route
-            path="/profile"
-            element={
-              <ProtectedRoute>
-                <Profile />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/profile/:userId"
-            element={
-              <ProtectedRoute>
-                <UserProfile />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/edit-profile"
-            element={
-              <ProtectedRoute>
-                <UpdateProfile />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/feed"
-            element={
-              <ProtectedRoute>
-                <Feed />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/my-posts"
-            element={
-              <ProtectedRoute>
-              <MyPostsPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/my-comments"
-            element={
-              <ProtectedRoute>
-              <MyCommentsPage />
-              </ProtectedRoute>
-            }
-          />
-         <Route
-  path="/post/:postId"
-  element={
-    <ProtectedRoute>
-      <SinglePostPage />
-    </ProtectedRoute>
-  }
-/>
-          <Route path="/empty" element={<Error />} />
-          <Route path="*" element={<NotFound />} /> {/* Catch-all for 404 */}
-        </Routes>
+          <Routes>
+            <Route
+              path="/login"
+              element={
+                <PublicRoute>
+                  <Login />
+                </PublicRoute>
+              }
+            />
+            <Route
+              path="/signup"
+              element={
+                <PublicRoute>
+                  <Signup />
+                </PublicRoute>
+              }
+            />
+            <Route
+              path="/"
+              element={
+                <PublicRoute>
+                  <Home />
+                </PublicRoute>
+              }
+            />
+            <Route path="/about" element={<About />} />
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute>
+                  <Profile />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/profile/:userId"
+              element={
+                <ProtectedRoute>
+                  <UserProfile />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/edit-profile"
+              element={
+                <ProtectedRoute>
+                  <UpdateProfile />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/feed"
+              element={
+                <ProtectedRoute>
+                  <Feed />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/my-posts"
+              element={
+                <ProtectedRoute>
+                  <MyPostsPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/my-comments"
+              element={
+                <ProtectedRoute>
+                  <MyCommentsPage />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute adminOnly>
+                  <Admin />
+                </ProtectedRoute>
+              }
+            >
+              <Route index element={<Navigate to="/admin/users" replace />} />
+              <Route path="users" element={<UserManagement />} />
+              <Route path="categories" element={<CategoryManagement />} />
+            </Route>
+            <Route
+              path="/post/:postId"
+              element={
+                <ProtectedRoute>
+                  <SinglePostPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route path="/empty" element={<Error />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
         </AuthProvider>
       </Router>
     </>
   );
 }
+
 export default App;
