@@ -25,22 +25,20 @@ const CodeConnectCategories = () => {
   ];
 
   return (
-    <section className="hidden md:flex flex-row items-center justify-between py-16 px-4 max-w-5xl mx-auto">
-      {/* Text and Categories (Left) */}
-      <div className="w-1/2 text-left">
+    <section className="flex flex-col md:flex-row items-center justify-between py-8 md:py-16 px-4 max-w-5xl mx-auto">
+      <div className="w-full md:w-1/2 text-left mb-8 md:mb-0">
         <img
           src={Logo}
           alt="CodeConnect Logo"
-          className="w-auto h-32 mb-6 object-contain transform rotate-45 animate-float"
+          className="w-auto h-24 md:h-32 mb-6 object-contain transform rotate-45 animate-float"
         />
-        <h1 className="text-3xl font-bold text-[#7ed957] mb-4">
+        <h1 className="text-2xl md:text-3xl font-bold text-[#7ed957] mb-4">
           Explore CodeConnect Categories
         </h1>
-        <p className="text-lg text-gray-600 mb-6">
+        <p className="text-base md:text-lg text-gray-600 mb-6">
           Connect with developers, explore insights, and find opportunities in tech.
         </p>
 
-        {/* Collaborative Articles */}
         <div className="mb-8">
           <h2 className="text-lg font-semibold text-gray-700 mb-4">
             Collaborative Articles
@@ -57,7 +55,6 @@ const CodeConnectCategories = () => {
           </div>
         </div>
 
-        {/* Job Opportunities */}
         <div>
           <h2 className="text-lg font-semibold text-gray-700 mb-4">
             Job Opportunities
@@ -75,16 +72,15 @@ const CodeConnectCategories = () => {
         </div>
       </div>
 
-      {/* Illustration (Right) */}
-      <div className="w-1/2 flex justify-center items-center relative">
+      <div className="w-full md:w-1/2 flex justify-center items-center">
         <img
           src={categoriesgif}
           alt="Developer working"
-          className="w-full h-auto object-contain rounded-lg absolute top-0 "
+          className="w-full h-auto object-contain rounded-lg"
         />
       </div>
-       {/* Inject styles */}
-       <style>{styles}</style>
+
+      <style>{styles}</style>
     </section>
   );
 };
@@ -100,4 +96,4 @@ const styles = `
   }
 `;
 
-export default CodeConnectCategories;
+export default CodeConnectCategories ;

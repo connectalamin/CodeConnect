@@ -15,18 +15,15 @@ const SearchComponent = ({ searchTerm, setSearchTerm }) => {
           borderColor: '#e2e8f0',
           '&:hover': { borderColor: '#94d2bd', backgroundColor: '#f8faf9' },
           '&:focus': { borderColor: '#94d2bd', boxShadow: '0 0 0 3px rgba(148, 210, 189, 0.2)' },
-          paddingLeft: '2.75rem',
+          paddingLeft: '2.25rem md:2.75rem',
           paddingRight: '1rem',
           color: '#2d3748',
           fontSize: '0.875rem',
           fontWeight: 600,
-          height: '3rem',
+          height: '2.75rem md:3rem',
           transition: 'all 0.3s ease',
         },
-        icon: {
-          marginRight: '0.875rem',
-          fontSize: '1.25rem',
-        },
+        icon: { marginRight: '0.75rem md:0.875rem', fontSize: '1.25rem' },
         label: { color: '#4a5568' },
       }}
     />
