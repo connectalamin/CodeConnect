@@ -65,7 +65,7 @@ const FilterComponent = ({
               onChange={setSelectedCategory}
               clearable
               searchable
-              nothingFound="No categories found"
+              nothingfound="No categories found"
               styles={{
                 input: { backgroundColor: 'rgba(240, 249, 235, 0.5)', borderColor: '#e2e8f0', '&:hover': { borderColor: '#94d2bd' }, color: '#4a5568' },
                 label: { color: '#4a5568' },
