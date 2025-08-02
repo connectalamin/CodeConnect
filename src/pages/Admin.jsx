@@ -1,21 +1,31 @@
 import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { FiUser, FiBarChart2 } from 'react-icons/fi';
-import { FaUserShield } from 'react-icons/fa';
-import { IoSettingsOutline } from 'react-icons/io5';
 import { useUserManagement } from '../hooks/useUserManagement';
 import { useCategoryManagement } from '../hooks/useCategoryManagement';
-import { CiMenuFries } from "react-icons/ci";
+import { 
+  Users, 
+  Tag, 
+  Shield, 
+  BarChart3, 
+  Menu, 
+  X,
+  LogOut,
+  ChevronRight,
+  Activity,
+  TrendingUp
+} from 'lucide-react';
+import { useAuth } from '../hooks/useAuth';
 
 const Admin = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { logout } = useAuth();
   const [activePage, setActivePage] = useState('users');
-  const [sidebarOpen, setSidebarOpen] = useState(false); // Added for mobile toggle
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const { users } = useUserManagement();
   const { categories } = useCategoryManagement();
-  const usercount = users.length;
-  const categorycount = categories.length;
+  const userCount = users.length;
+  const categoryCount = categories.length;
 
   useEffect(() => {
     if (location.pathname === '/admin') {
@@ -29,87 +39,164 @@ const Admin = () => {
   }, [location, navigate]);
 
   const adminNavLinks = [
-    { path: '/admin/users', label: 'User Management', icon: <FiUser className="text-xl" /> },
-    { path: '/admin/categories', label: 'Category Management', icon: <IoSettingsOutline className="text-xl" /> },
+    { 
+      path: '/admin/users', 
+      label: 'Users', 
+      icon: <Users className="w-4 h-4" />,
+      count: userCount
+    },
+    { 
+      path: '/admin/categories', 
+      label: 'Categories', 
+      icon: <Tag className="w-4 h-4" />,
+      count: categoryCount
+    },
   ];
 
+  const handleLogout = async () => {
+    await logout();
+    navigate('/', { replace: true });
+  };
+
   return (
-    <div className="min-h-screen bg-gray-100">
-      <div className="flex flex-col md:flex-row h-screen">
-        {/* Sidebar Toggle Button for Mobile */}
-        <div className="md:hidden flex items-center justify-between p-4 bg-white shadow-md">
-          <h1 className="text-xl font-bold text-gray-900">Admin Panel</h1>
-          <CiMenuFries
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="text-2xl text-gray-600 cursor-pointer"
-          />
+    <div className="h-screen bg-slate-50 overflow-hidden">
+      {/* Mobile Header */}
+      <div className="md:hidden bg-white border-b border-slate-200 px-4 py-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <div className="w-8 h-8 bg-[#7ED957] rounded-lg flex items-center justify-center">
+              <Shield className="w-4 h-4 text-white" />
+            </div>
+            <span className="font-semibold text-slate-900">Admin</span>
+          </div>
+            <button
+            onClick={() => setSidebarOpen(true)}
+            className="p-2 rounded-lg text-slate-600 hover:bg-slate-100"
+            >
+            <Menu className="w-5 h-5" />
+            </button>
         </div>
+      </div>
+
+      <div className="flex h-full">
+        {/* Mobile Overlay */}
+        {sidebarOpen && (
+          <div 
+            className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 md:hidden"
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
 
         {/* Sidebar */}
         <div
           className={`${
-            sidebarOpen ? "translate-x-0 opacity-100" : "-translate-x-full opacity-0 md:translate-x-0 md:opacity-100"
-          } w-full md:w-72 bg-white shadow-lg border-r border-gray-200 flex flex-col fixed md:static top-0 left-0 h-full z-20 transition-all duration-300`}
+            sidebarOpen ? "translate-x-0" : "-translate-x-full"
+          } md:translate-x-0 fixed md:static inset-y-0 left-0 z-50 w-72 bg-white border-r border-slate-200 flex flex-col transition-transform duration-300`}
         >
-          <div className="p-4 md:p-6 border-b border-gray-200">
+          {/* Desktop Header */}
+          <div className="hidden md:flex items-center justify-between p-6 border-b border-slate-200">
             <div className="flex items-center space-x-3">
-              <FaUserShield className="text-2xl md:text-3xl text-green-600" />
+              <div className="w-10 h-10 bg-[#7ED957] rounded-xl flex items-center justify-center">
+                <Shield className="w-6 h-6 text-white" />
+              </div>
               <div>
-                <h1 className="text-lg md:text-xl font-bold text-gray-900">Admin Panel</h1>
-                <p className="text-xs md:text-sm text-gray-500">Control Center</p>
+                <h1 className="font-bold text-slate-900">Admin</h1>
+                <p className="text-xs text-slate-500">Dashboard</p>
               </div>
             </div>
           </div>
 
-          <nav className="flex-1 p-4">
-            <ul className="space-y-2">
-              {adminNavLinks.map((link) => (
-                <li key={link.path}>
-                  <NavLink
-                    to={link.path}
-                    className={({ isActive }) =>
-                      `flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
-                        isActive
-                          ? 'bg-green-600 text-white shadow-md'
-                          : 'text-gray-600 hover:bg-gray-100 hover:text-green-600'
-                      }`
-                    }
-                    onClick={() => setSidebarOpen(false)} // Close sidebar on link click
-                  >
-                    {link.icon}
-                    <span className="font-medium text-sm md:text-base">{link.label}</span>
-                  </NavLink>
-                </li>
-              ))}
-            </ul>
-          </nav>
+          {/* Mobile Sidebar Header */}
+          <div className="md:hidden p-4 border-b border-slate-200">
+            <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+                <div className="w-8 h-8 bg-[#7ED957] rounded-lg flex items-center justify-center">
+                  <Shield className="w-4 h-4 text-white" />
+              </div>
+                <span className="font-semibold text-slate-900">Admin</span>
+              </div>
+              <button
+                onClick={() => setSidebarOpen(false)}
+                className="p-1 rounded-lg text-slate-600 hover:bg-slate-100"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
 
-          {/* Stats Section */}
-          <div className="p-4 border-t border-gray-200">
-            <div className="bg-green-50 rounded-lg p-4">
-              <h3 className="text-sm font-semibold text-green-700 flex items-center gap-2 mb-3">
-                <FiBarChart2 /> Quick Stats
-              </h3>
+            {/* Navigation */}
+          <nav className="flex-1 p-4">
+            <div className="space-y-1">
+              {adminNavLinks.map((link) => (
+                <NavLink
+                  key={link.path}
+                  to={link.path}
+                  className={({ isActive }) =>
+                    `group flex items-center justify-between px-3 py-2.5 rounded-lg transition-all duration-200 ${
+                      isActive
+                        ? 'bg-[#7ED957] text-white shadow-sm'
+                        : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                    }`
+                  }
+                  onClick={() => setSidebarOpen(false)}
+                >
+                  <div className="flex items-center space-x-3">
+                  {link.icon}
+                    <span className="font-medium">{link.label}</span>
+                  </div>
+                  <div className={`flex items-center space-x-2 ${
+                    location.pathname === link.path ? 'text-white/80' : 'text-slate-400'
+                  }`}>
+                    <span className="text-xs font-medium">{link.count}</span>
+                    <ChevronRight className="w-3 h-3" />
+                  </div>
+                </NavLink>
+              ))}
+            </div>
+            </nav>
+
+          {/* Stats Cards */}
+          <div className="p-4 space-y-3">
+            <div className="bg-gradient-to-br from-[#7ED957]/5 to-[#6cc149]/5 rounded-xl p-4">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center space-x-2">
+                  <Activity className="w-4 h-4 text-[#7ED957]" />
+                  <span className="text-sm font-medium text-slate-700">Overview</span>
+                  </div>
+                <TrendingUp className="w-4 h-4 text-[#7ED957]" />
+              </div>
               <div className="grid grid-cols-2 gap-3">
-                <div className="bg-white p-3 rounded-lg shadow-sm">
-                  <p className="text-xs text-gray-600">Total Users</p>
-                  <p className="text-lg md:text-xl font-bold text-green-600">{usercount}</p>
-                </div>
-                <div className="bg-white p-3 rounded-lg shadow-sm">
-                  <p className="text-xs text-gray-600">Categories</p>
-                  <p className="text-lg md:text-xl font-bold text-green-600">{categorycount}</p>
+                <div className="text-center">
+                  <div className="text-lg font-bold text-slate-900">{userCount}</div>
+                  <div className="text-xs text-slate-500">Users</div>
+                  </div>
+                <div className="text-center">
+                  <div className="text-lg font-bold text-slate-900">{categoryCount}</div>
+                  <div className="text-xs text-slate-500">Categories</div>
                 </div>
               </div>
             </div>
+          </div>
+
+          {/* Logout */}
+          <div className="p-4 border-t border-slate-200">
+            <button
+              onClick={handleLogout}
+              className="w-full flex items-center justify-center space-x-2 px-3 py-2.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200"
+            >
+              <LogOut className="w-4 h-4" />
+              <span className="font-medium">Logout</span>
+            </button>
           </div>
         </div>
 
         {/* Main Content */}
-        <div className="flex-1 overflow-auto">
-          <div className="p-4 md:p-8">
-            <div className="bg-white rounded-xl shadow-lg p-4 md:p-6 min-h-[calc(100vh-2rem)] md:min-h-[calc(100vh-4rem)]">
-              <Outlet />
-            </div>
+        <div className="flex-1 flex flex-col h-full">
+          {/* Content Area - Full Height with Scroll */}
+          <div className="flex-1 p-4 md:p-8 overflow-hidden">
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 h-full overflow-auto">
+            <Outlet />
+          </div>
           </div>
         </div>
       </div>

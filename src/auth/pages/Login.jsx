@@ -3,15 +3,17 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { toast } from 'react-hot-toast';
 import { useState } from 'react';
-import { TextInput, Button, PasswordInput, Stack, Text } from '@mantine/core';
 import { IoEyeOutline, IoEyeOffOutline } from 'react-icons/io5';
 import { Link } from 'react-router-dom';
 import HashLoader from 'react-spinners/HashLoader';
+import { FaEnvelope, FaLock, FaRocket } from 'react-icons/fa';
+import Logo from '../../assets/CodeConnect.svg';
 
 const Login = () => {
   const [credentials, setCredentials] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
 
@@ -63,71 +65,115 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-white to-[#f0f9eb]">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-white to-[#f0f9eb] p-4">
       {loading ? (
-        <HashLoader color="#7ec226" loading speedMultiplier={2} />
+        <div className="flex flex-col items-center space-y-4">
+          <HashLoader color="#7ed957" loading speedMultiplier={2} />
+          <p className="text-slate-600 font-medium">Signing you in...</p>
+        </div>
       ) : (
-        <div className="w-full max-w-md p-8 bg-white rounded-xl shadow-lg border border-gray-100 transform transition-all hover:shadow-xl">
-          <Stack spacing="lg">
-            <Text
-              size="xl"
-              weight={700}
-              align="center"
-              className="text-gray-800 bg-gradient-to-r from-[#7ed957] to-[#4caf50] bg-clip-text"
-            >
-              Welcome to CodeConnect
-            </Text>
-            {error && <p className="text-red-500 mb-4">{error}</p>}
-            <form onSubmit={handleSubmit}>
-              <Stack spacing="md">
-                <TextInput
-                  label="Email"
-                  placeholder="you@codeconnect.com"
-                  withAsterisk
-                  variant="filled"
-                  value={credentials.email}
-                  type="email"
-                  name="email"
-                  onChange={handleChange}
-                  classNames={{
-                    input: 'border-gray-200 focus:border-[#7ed957] transition-colors duration-300',
-                    label: 'text-gray-700 font-medium',
-                  }}
+        <div className="w-full max-w-md">
+          {/* Header */}
+          <div className="text-center mb-8">
+            <div className="flex justify-center mb-4">
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-[#7ed957]/20 to-transparent rounded-full blur-xl"></div>
+                <img
+                  src={Logo}
+                  alt="CodeConnect Logo"
+                  className="relative w-16 h-16 object-contain transform rotate-45"
                 />
-                <PasswordInput
-                  label="Password"
-                  placeholder="Enter your password"
-                  value={credentials.password}
-                  onChange={handleChange}
-                  type="password"
-                  name="password"
-                  visibilityToggleIcon={({ reveal }) =>
-                    reveal ? <IoEyeOutline size={20} color="#7ed957" /> : <IoEyeOffOutline size={20} color="#7ed957" />
-                  }
-                  withAsterisk
-                  variant="filled"
-                  classNames={{
-                    input: 'border-gray-200 focus:border-[#7ed957] transition-colors duration-300',
-                    label: 'text-gray-700 font-medium',
-                  }}
-                />
-                <Button
-                  type="submit"
-                  fullWidth
-                  className="bg-[#7ed957] hover:bg-[#6cc149] transition-all duration-300 transform hover:scale-105"
-                  radius="md"
-                >
-                  Log In
-                </Button>
-              </Stack>
+              </div>
+            </div>
+            <h1 className="text-3xl font-bold text-slate-900 mb-2">
+              Welcome Back
+            </h1>
+            <p className="text-slate-600">
+              Sign in to your CodeConnect account
+            </p>
+          </div>
+
+          {/* Form */}
+          <div className="bg-white rounded-3xl shadow-xl border border-slate-200 p-8">
+            {error && (
+              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-2xl">
+                <p className="text-red-600 text-sm">{error}</p>
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Email Field */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Email Address
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <FaEnvelope className="text-slate-400" />
+                  </div>
+                  <input
+                    type="email"
+                    name="email"
+                    value={credentials.email}
+                    onChange={handleChange}
+                    className="w-full pl-12 pr-4 py-3 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-[#7ed957]/20 focus:border-[#7ed957] transition-all duration-300 bg-slate-50/50"
+                    placeholder="you@codeconnect.com"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Password Field */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Password
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <FaLock className="text-slate-400" />
+                  </div>
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    name="password"
+                    value={credentials.password}
+                    onChange={handleChange}
+                    className="w-full pl-12 pr-12 py-3 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-[#7ed957]/20 focus:border-[#7ed957] transition-all duration-300 bg-slate-50/50"
+                    placeholder="Enter your password"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-slate-600 transition-colors duration-300"
+                  >
+                    {showPassword ? <IoEyeOffOutline size={20} /> : <IoEyeOutline size={20} />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Submit Button */}
+              <button
+                type="submit"
+                className="w-full bg-[#7ed957] text-white font-semibold py-3 px-6 rounded-2xl hover:bg-[#6cc149] transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center justify-center space-x-2"
+              >
+                <FaRocket className="text-sm" />
+                <span>Sign In</span>
+              </button>
             </form>
-            <Text size="sm" align="center" color="gray">
-              Don’t have an account?{' '}
-              <Link to="/signup" className="text-[#7ed957] font-medium cursor-pointer hover:underline">
-                Sign Up
-              </Link>
-            </Text>
-          </Stack>
+
+            {/* Sign Up Link */}
+            <div className="mt-6 text-center">
+              <p className="text-slate-600 text-sm">
+                Don't have an account?{' '}
+                <Link 
+                  to="/signup" 
+                  className="text-[#7ed957] font-semibold hover:text-[#6cc149] transition-colors duration-300"
+                >
+                  Sign Up
+                </Link>
+              </p>
+            </div>
+          </div>
         </div>
       )}
     </div>

@@ -36,42 +36,52 @@ const About = () => {
   return (
     <>
       <Navbar />
-      <div className="bg-gradient-to-br from-white to-[#f0f9eb]">
-        <section className="flex flex-col md:flex-row items-center justify-between py-8 md:py-16 px-4 max-w-5xl mx-auto">
-          <div className="w-full md:w-1/2 text-left mb-8 md:mb-0">
-            <img
-              src={Logo}
-              alt="CodeConnect Logo"
-              className="w-auto h-24 md:h-32 mb-6 object-contain transform rotate-45 animate-float"
-            />
-            <h1 className="text-2xl md:text-3xl font-bold text-[#7ed957] mb-4">
-              About CodeConnect
+      <div className="bg-gradient-to-br from-white to-[#f0f9eb] h-screen overflow-hidden">
+        <section className="flex flex-col md:flex-row items-center justify-between py-8 md:py-12 px-4 max-w-6xl mx-auto h-full">
+          <div className="w-full md:w-1/2 text-left mb-8 md:mb-0 md:pr-8 overflow-y-auto">
+            {/* Logo with modern styling */}
+            <div className="relative mb-6">
+              <div className="absolute inset-0 bg-gradient-to-r from-[#7ed957]/20 to-transparent rounded-full blur-xl"></div>
+              <img
+                src={Logo}
+                alt="CodeConnect Logo"
+                className="relative w-20 h-20 object-contain transform rotate-45 animate-float"
+              />
+            </div>
+            
+            {/* Main heading with modern typography */}
+            <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
+              About <span className="text-[#7ed957] bg-gradient-to-r from-[#7ed957] to-[#6cc149] bg-clip-text text-transparent">CodeConnect</span>
             </h1>
-            <p className="text-base md:text-lg text-gray-600 mb-6">
+            
+            {/* Description with better typography */}
+            <p className="text-base md:text-lg text-slate-600 mb-6 leading-relaxed">
               <span className="font-semibold text-[#5caa3b]">CodeConnect</span> is your hub for developer, student, teacher collaboration, designed to help you <span className="text-[#5caa3b] font-semibold">debug smarter, not harder.</span>
             </p>
 
-            <div className="mb-6">
-              <h2 className="text-lg md:text-xl font-semibold text-gray-700 mb-2">
-                Made by Alamin <span className="text-xs text-[#5caa3b]">(Session 2020-2021)</span>
+            {/* Creator section with modern card design */}
+            <div className="bg-white p-4 rounded-2xl shadow-lg border border-slate-200 mb-6">
+              <h2 className="text-lg md:text-xl font-bold text-slate-900 mb-2">
+                Made by Alamin <span className="text-sm text-[#5caa3b] font-normal">(Session 2020-2021)</span>
               </h2>
-              <p className="text-gray-600">
+              <p className="text-slate-600 leading-relaxed text-sm">
                 Crafted with passion by Alamin as a semester project to empower the developer community of Comilla University.
               </p>
             </div>
 
-            <div className="mb-6">
-              <h2 className="text-lg md:text-xl font-semibold text-gray-700 mb-4">
+            {/* Technologies section with modern styling */}
+            <div className="bg-white p-4 rounded-2xl shadow-lg border border-slate-200 mb-6">
+              <h2 className="text-lg md:text-xl font-bold text-slate-900 mb-3">
                 Technologies Used
               </h2>
-              <div className="flex flex-wrap gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                 {technologies.map((tech, index) => (
                   <div
                     key={index}
-                    className="flex items-center gap-2 py-2 px-4 bg-gray-100 rounded-full hover:bg-[#7ed957] hover:text-white transition-all duration-300 cursor-pointer"
+                    className="flex items-center p-2 bg-slate-50 rounded-xl hover:bg-[#7ed957]/10 transition-all duration-300 cursor-pointer group"
                   >
                     {tech.icon}
-                    <span className="text-sm font-medium text-gray-700 hover:text-white">
+                    <span className="ml-2 text-xs font-medium text-slate-700 group-hover:text-slate-900">
                       {tech.name}
                     </span>
                   </div>
@@ -79,22 +89,28 @@ const About = () => {
               </div>
             </div>
 
-            <div>
-              <h2 className="text-lg md:text-xl font-semibold text-gray-700 mb-2">
+            {/* Project info with modern card */}
+            <div className="bg-white p-4 rounded-2xl shadow-lg border border-slate-200">
+              <h2 className="text-lg md:text-xl font-bold text-slate-900 mb-2">
                 As a Semester Project
               </h2>
-              <p className="text-gray-600">
+              <p className="text-slate-600 leading-relaxed text-sm">
                 Developed as part of an academic semester, <span className="font-semibold text-[#5caa3b]">CodeConnect</span> showcases innovative solutions for tech collaboration.
               </p>
             </div>
           </div>
 
+          {/* Right side image with modern styling */}
           <div className="w-full md:w-1/2 flex justify-center items-center">
-            <img
-              src={aboutgif}
-              alt="Developer collaboration"
-              className="w-full h-auto object-contain rounded-lg animate-pulse-slow"
-            />
+            <div className="relative group">
+              <div className="absolute inset-0 bg-gradient-to-r from-[#7ed957]/20 to-transparent rounded-3xl transform rotate-3 group-hover:rotate-6 transition-transform duration-500"></div>
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-3xl transform -rotate-2 group-hover:-rotate-4 transition-transform duration-500"></div>
+              <img
+                src={aboutgif}
+                alt="Developer collaboration"
+                className="relative w-full h-auto max-w-md object-contain rounded-3xl shadow-2xl transform -rotate-1 group-hover:rotate-0 transition-transform duration-500"
+              />
+            </div>
           </div>
         </section>
       </div>
@@ -110,16 +126,8 @@ const styles = `
     50% { transform: translateY(-10px) rotate(45deg); }
     100% { transform: translateY(0) rotate(45deg); }
   }
-  @keyframes pulseSlow {
-    0% { opacity: 1; }
-    50% { opacity: 0.8; }
-    100% { opacity: 1; }
-  }
   .animate-float {
     animation: float 3s ease-in-out infinite;
-  }
-  .animate-pulse-slow {
-    animation: pulseSlow 4s ease-in-out infinite;
   }
 `;
 

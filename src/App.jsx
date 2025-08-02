@@ -28,6 +28,10 @@ import UserProfile from "./pages/Profile";
 import UserManagement from "./pages/UserManagement";
 import CategoryManagement from "./pages/CategoryManagement";
 import Admin from "./pages/Admin";
+import Leaderboard from "./pages/LeaderboardPage";
+import NotificationsPage from "./pages/NotificationsPage";
+import SavedPostsPage from "./pages/SavedPostsPage";
+import ChatRoomsPage from "./pages/ChatRoomsPage";
 
 function App() {
   const [authReady, setAuthReady] = useState(false);
@@ -144,6 +148,40 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/leaderboard"
+              element={
+                <ProtectedRoute>
+                  <Leaderboard />
+                </ProtectedRoute>
+              }
+            />
+                          <Route
+                path="/notifications"
+                element={
+                  <ProtectedRoute>
+                    <NotificationsPage />
+                  </ProtectedRoute>
+                }
+              />
+              
+              <Route
+                path="/saved-posts"
+                element={
+                  <ProtectedRoute>
+                    <SavedPostsPage />
+                  </ProtectedRoute>
+                }
+              />
+
+                             <Route
+                 path="/chat-rooms"
+                 element={
+                   <ProtectedRoute>
+                     <ChatRoomsPage />
+                   </ProtectedRoute>
+                 }
+               />
 
             <Route
               path="/admin"

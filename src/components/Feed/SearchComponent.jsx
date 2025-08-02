@@ -1,32 +1,19 @@
-import { TextInput } from '@mantine/core';
+import { FaSearch } from 'react-icons/fa';
 
 const SearchComponent = ({ searchTerm, setSearchTerm }) => {
   return (
-    <TextInput
-      placeholder="Search posts by title or category..."
-      radius="lg"
-      className="w-full"
-      icon={<span className="text-[#94d2bd]">🔍</span>}
-      value={searchTerm}
-      onChange={(e) => setSearchTerm(e.target.value)}
-      styles={{
-        input: {
-          backgroundColor: '#ffffff',
-          borderColor: '#e2e8f0',
-          '&:hover': { borderColor: '#94d2bd', backgroundColor: '#f8faf9' },
-          '&:focus': { borderColor: '#94d2bd', boxShadow: '0 0 0 3px rgba(148, 210, 189, 0.2)' },
-          paddingLeft: '2.25rem md:2.75rem',
-          paddingRight: '1rem',
-          color: '#2d3748',
-          fontSize: '0.875rem',
-          fontWeight: 600,
-          height: '2.75rem md:3rem',
-          transition: 'all 0.3s ease',
-        },
-        icon: { marginRight: '0.75rem md:0.875rem', fontSize: '1.25rem' },
-        label: { color: '#4a5568' },
-      }}
-    />
+    <div className="relative">
+      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+        <FaSearch className="h-5 w-5 text-[#7ed957]" />
+      </div>
+      <input
+        type="text"
+        placeholder="Search posts by title or category..."
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        className="block w-full pl-10 pr-3 py-3 border border-slate-200 rounded-2xl bg-white text-slate-900 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#7ed957]/20 focus:border-[#7ed957] transition-all duration-200 hover:border-[#7ed957]/50"
+      />
+    </div>
   );
 };
 

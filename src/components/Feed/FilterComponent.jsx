@@ -1,5 +1,6 @@
-import { Card, Text, Stack, Select, Button } from '@mantine/core';
+import { useState } from 'react';
 import { useCategoryManagement } from '../../hooks/useCategoryManagement';
+import { FaFilter, FaCalendar, FaList, FaSort, FaChevronDown } from 'react-icons/fa';
 
 const FilterComponent = ({
   selectedDateRange,
@@ -10,90 +11,142 @@ const FilterComponent = ({
   setSelectedSort,
 }) => {
   const { categories, isLoading, error } = useCategoryManagement();
+  const [showDateDropdown, setShowDateDropdown] = useState(false);
+  const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
+
+  const dateOptions = ['All time', 'Last 24 Hours', 'Last 7 days', 'Last 30 days'];
+  const sortOptions = ['Recent', 'Top'];
+
   const categoryOptions = categories?.map((category) => ({
     value: category.id.toString(),
     label: category.name,
   })) || [];
 
   return (
-    <Card
-      shadow="lg"
-      radius="xl"
-      className="p-4 md:p-6 bg-gradient-to-b from-white to-gray-50 border border-gray-200 transition-all duration-300 hover:shadow-xl hover:border-[#94d2bd]"
-    >
-      <Stack spacing="md">
-        <Text
-          size="base md:lg"
-          weight={700}
-          className="text-gray-900 bg-[#F6FBF5] px-3 py-1 rounded-full text-center"
-          style={{ lineHeight: '1.2' }}
-        >
-          Filters
-        </Text>
-        {isLoading ? (
-          <Text size="sm" color="gray" className="text-center">Loading filters...</Text>
-        ) : error ? (
-          <Text size="sm" color="red" className="text-center">Error loading categories: {error}</Text>
-        ) : (
-          <Stack spacing="xs">
-            <Select
-              label={<Text size="sm" weight={500} color="gray-700">Date</Text>}
-              placeholder="Select date range"
-              data={[
-                { value: 'Last 24 Hours', label: 'Last 24 Hours' },
-                { value: 'Last 7 days', label: 'Last 7 days' },
-                { value: 'Last 30 days', label: 'Last 30 days' },
-                { value: 'All time', label: 'All time' },
-              ]}
-              radius="md"
-              className="w-full"
-              value={selectedDateRange}
-              onChange={setSelectedDateRange}
-              clearable
-              styles={{
-                input: { backgroundColor: 'rgba(240, 249, 235, 0.5)', borderColor: '#e2e8f0', '&:hover': { borderColor: '#94d2bd' }, color: '#4a5568' },
-                label: { color: '#4a5568' },
-              }}
-            />
-            <Select
-              label={<Text size="sm" weight={500} color="gray-700">Category</Text>}
-              placeholder="Select category"
-              data={[{ value: 'all', label: 'All Categories' }, ...categoryOptions]}
-              radius="md"
-              className="w-full"
-              value={selectedCategory}
-              onChange={setSelectedCategory}
-              clearable
-              searchable
-              nothingfound="No categories found"
-              styles={{
-                input: { backgroundColor: 'rgba(240, 249, 235, 0.5)', borderColor: '#e2e8f0', '&:hover': { borderColor: '#94d2bd' }, color: '#4a5568' },
-                label: { color: '#4a5568' },
-              }}
-            />
-            <Stack spacing="xs" className="pl-2">
-              <Text size="sm" weight={500} color="gray-700">Sort By</Text>
-              <Button
-                variant="subtle"
-                radius="md"
-                className={`text-gray-700 hover:bg-[#94d2bd]/20 hover:text-[#94d2bd] transition-all duration-200 ${selectedSort === 'Top' ? 'bg-[#94d2bd]/20 text-[#94d2bd]' : ''}`}
-                onClick={() => setSelectedSort('Top')}
+    <div className="bg-gradient-to-br from-slate-50 to-white p-6 rounded-3xl shadow-lg border border-slate-200 hover:shadow-xl transition-all duration-300">
+      <div className="flex items-center mb-6">
+        <div className="p-2 bg-[#7ed957] rounded-xl mr-3">
+          <FaFilter className="text-white text-lg" />
+        </div>
+        <h3 className="text-xl font-bold text-slate-900">Smart Filters</h3>
+      </div>
+      
+      {isLoading ? (
+        <div className="text-center py-4">
+          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[#7ed957] mx-auto"></div>
+          <p className="text-sm text-slate-600 mt-2">Loading filters...</p>
+        </div>
+      ) : error ? (
+        <div className="text-center py-4">
+          <p className="text-sm text-red-500">Error loading categories: {error}</p>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {/* Date Filter */}
+          <div className="relative">
+            <label className="block text-sm font-medium text-slate-700 mb-2 flex items-center">
+              <FaCalendar className="mr-2 text-[#7ed957]" />
+              Date Range
+            </label>
+            <div className="relative">
+              <button
+                onClick={() => setShowDateDropdown(!showDateDropdown)}
+                className="w-full flex items-center justify-between p-3 bg-white border border-slate-200 rounded-xl hover:border-[#7ed957] transition-colors"
               >
-                Top
-              </Button>
-              <Button
-                variant="subtle"
-                radius="md"
-                className={`text-gray-700 hover:bg-[#94d2bd]/20 hover:text-[#94d2bd] transition-all duration-200 ${selectedSort === 'Recent' ? 'bg-[#94d2bd]/20 text-[#94d2bd]' : ''}`}
-                onClick={() => setSelectedSort('Recent')}
+                <span className="text-slate-700">{selectedDateRange}</span>
+                <FaChevronDown className={`text-slate-400 transition-transform ${showDateDropdown ? 'rotate-180' : ''}`} />
+              </button>
+              {showDateDropdown && (
+                <div className="absolute z-10 w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-lg">
+                  {dateOptions.map((option) => (
+                    <button
+                      key={option}
+                      onClick={() => {
+                        setSelectedDateRange(option);
+                        setShowDateDropdown(false);
+                      }}
+                      className="w-full text-left px-3 py-2 hover:bg-[#7ed957]/10 transition-colors"
+                    >
+                      {option}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Category Filter */}
+          <div className="relative">
+            <label className="block text-sm font-medium text-slate-700 mb-2 flex items-center">
+              <FaList className="mr-2 text-[#7ed957]" />
+              Category
+            </label>
+            <div className="relative">
+              <button
+                onClick={() => setShowCategoryDropdown(!showCategoryDropdown)}
+                className="w-full flex items-center justify-between p-3 bg-white border border-slate-200 rounded-xl hover:border-[#7ed957] transition-colors"
               >
-                Recent
-              </Button>
-            </Stack>
-          </Stack>
-        )}
-      </Stack>
-    </Card>
+                <span className="text-slate-700">
+                  {selectedCategory === 'all' || !selectedCategory 
+                    ? 'All Categories' 
+                    : categoryOptions.find(cat => cat.value === selectedCategory)?.label || 'Select category'
+                  }
+                </span>
+                <FaChevronDown className={`text-slate-400 transition-transform ${showCategoryDropdown ? 'rotate-180' : ''}`} />
+              </button>
+              {showCategoryDropdown && (
+                <div className="absolute z-10 w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-lg max-h-48 overflow-y-auto">
+                  <button
+                    onClick={() => {
+                      setSelectedCategory('all');
+                      setShowCategoryDropdown(false);
+                    }}
+                    className="w-full text-left px-3 py-2 hover:bg-[#7ed957]/10 transition-colors"
+                  >
+                    All Categories
+                  </button>
+                  {categoryOptions.map((category) => (
+                    <button
+                      key={category.value}
+                      onClick={() => {
+                        setSelectedCategory(category.value);
+                        setShowCategoryDropdown(false);
+                      }}
+                      className="w-full text-left px-3 py-2 hover:bg-[#7ed957]/10 transition-colors"
+                    >
+                      {category.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Sort Options */}
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-2 flex items-center">
+              <FaSort className="mr-2 text-[#7ed957]" />
+              Sort By
+            </label>
+            <div className="flex space-x-2">
+              {sortOptions.map((option) => (
+                <button
+                  key={option}
+                  onClick={() => setSelectedSort(option)}
+                  className={`flex-1 py-2 px-3 rounded-xl font-medium transition-all duration-200 ${
+                    selectedSort === option
+                      ? 'bg-[#7ed957] text-white shadow-md'
+                      : 'bg-white text-slate-600 border border-slate-200 hover:border-[#7ed957] hover:text-[#7ed957]'
+                  }`}
+                >
+                  {option}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 

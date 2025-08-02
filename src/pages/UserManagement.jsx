@@ -1,32 +1,9 @@
 import { useEffect } from "react";
-import {
-  Container,
-  Title,
-  Text,
-  Group,
-  Card,
-  Table,
-  ActionIcon,
-  Badge,
-  Loader,
-} from "@mantine/core";
 import toast from 'react-hot-toast';
 import Navbar from "../components/Navbar";
 import { useAuth } from "../hooks/useAuth";
 import { useUserManagement } from "../hooks/useUserManagement";
-
-const TrashIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    strokeWidth={1.5}
-    stroke="currentColor"
-    className="w-5 h-5 hover:scale-110 transition-transform duration-200"
-  >
-    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-  </svg>
-);
+import { Users, Trash2, Shield, User, Mail, Loader2 } from "lucide-react";
 
 const UserManagement = () => {
   const { token } = useAuth();
@@ -41,83 +18,132 @@ const UserManagement = () => {
   return (
     <>
       <Navbar />
-      <Container
-        fluid
-        className="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen text-gray-900 p-4 md:p-8"
-      >
-        <Title
-          order={1}
-          className="text-2xl md:text-4xl font-extrabold text-green-400 mb-6 tracking-tight animate-fadeIn"
-        >
-          User Management
-        </Title>
+      <div className="min-h-screen bg-gradient-to-br from-white to-[#f0f9eb] p-4 sm:p-6 lg:p-8">
+        <div className="max-w-7xl mx-auto">
+          {/* Header */}
+          <div className="mb-8">
+            <div className="flex items-center space-x-3 mb-4">
+              <div className="w-12 h-12 bg-[#7ED957]/10 rounded-xl flex items-center justify-center">
+                <Users className="w-6 h-6 text-[#7ED957]" />
+              </div>
+              <div>
+                <h1 className="text-3xl font-bold text-slate-900">User Management</h1>
+                <p className="text-slate-600">Manage user accounts and permissions</p>
+              </div>
+            </div>
+          </div>
 
-        {isLoading ? (
-          <Card className="bg-white rounded-2xl p-6 md:p-8 shadow-lg flex items-center justify-center h-64">
-            <Loader color="indigo" size="lg" />
-          </Card>
-        ) : isError ? (
-          <Card className="bg-white rounded-2xl p-6 md:p-8 shadow-lg">
-            <Text color="red">Error loading users: {error}</Text>
-          </Card>
-        ) : (
-          <Card
-            className="bg-white rounded-2xl p-4 md:p-8 shadow-lg hover:shadow-xl transition-shadow duration-300 border border-gray-200"
-            withBorder
-          >
-            <Text size="xl" weight={700} className="mb-4 md:mb-6 text-gray-800 tracking-wide">
-              Manage Users
-            </Text>
-            <div className="overflow-x-auto">
-              <Table className="bg-gray-50 rounded-xl w-full">
-                <thead>
-                  <tr className="bg-indigo-50 text-green-700">
-                    <th className="text-left p-2 md:p-4 font-semibold">Name</th>
-                    <th className="text-left p-2 md:p-4 font-semibold">Email</th>
-                    <th className="text-left p-2 md:p-4 font-semibold">Role</th>
-                    <th className="text-left p-2 md:p-4 font-semibold">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {users.map((user) => (
-                    <tr
-                      key={user.id}
-                      className="border-t border-gray-200 hover:bg-indigo-50 transition-colors duration-200"
-                    >
-                      <td className="p-2 md:p-4 text-gray-800 font-medium">{user.name}</td>
-                      <td className="p-2 md:p-4 text-gray-600">{user.email}</td>
-                      <td className="p-2 md:p-4">
-                        <Badge
-                          className="px-2 md:px-3 py-1 rounded-full font-semibold tracking-wide"
-                          color={user.role === "Admin" ? "indigo" : "gray"}
-                          variant="filled"
-                        >
-                          {user.role}
-                        </Badge>
-                      </td>
-                      <td className="p-2 md:p-4">
-                        <Group spacing="xs">
-                          <ActionIcon
-                            color="red"
-                            variant="filled"
-                            size="md"
-                            className="hover:bg-red-600 hover:scale-105 transition-all duration-200"
+          {/* Main Content */}
+          {isLoading ? (
+            <div className="bg-white rounded-2xl shadow-xl border border-slate-200 p-8">
+              <div className="flex flex-col items-center justify-center space-y-4 h-64">
+                <Loader2 className="w-8 h-8 text-[#7ED957] animate-spin" />
+                <p className="text-slate-600">Loading users...</p>
+              </div>
+            </div>
+          ) : isError ? (
+            <div className="bg-white rounded-2xl shadow-xl border border-slate-200 p-8">
+              <div className="flex items-center space-x-3 text-red-600">
+                <div className="w-5 h-5 bg-red-100 rounded-full flex items-center justify-center">
+                  <span className="text-xs font-bold">!</span>
+                </div>
+                <p>Error loading users: {error}</p>
+              </div>
+            </div>
+          ) : (
+            <div className="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
+              {/* Table Header */}
+              <div className="bg-slate-50 px-6 py-4 border-b border-slate-200">
+                <h2 className="text-xl font-semibold text-slate-900">Manage Users</h2>
+                <p className="text-sm text-slate-600 mt-1">Total users: {users.length}</p>
+              </div>
+
+              {/* Table */}
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-slate-50 border-b border-slate-200">
+                    <tr>
+                      <th className="text-left px-6 py-4 text-sm font-semibold text-slate-700">
+                        <div className="flex items-center space-x-2">
+                          <User className="w-4 h-4" />
+                          <span>Name</span>
+                        </div>
+                      </th>
+                      <th className="text-left px-6 py-4 text-sm font-semibold text-slate-700">
+                        <div className="flex items-center space-x-2">
+                          <Mail className="w-4 h-4" />
+                          <span>Email</span>
+                        </div>
+                      </th>
+                      <th className="text-left px-6 py-4 text-sm font-semibold text-slate-700">
+                        <div className="flex items-center space-x-2">
+                          <Shield className="w-4 h-4" />
+                          <span>Role</span>
+                        </div>
+                      </th>
+                      <th className="text-right px-6 py-4 text-sm font-semibold text-slate-700">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-200">
+                    {users.map((user) => (
+                      <tr key={user.id} className="hover:bg-slate-50 transition-colors duration-200">
+                        <td className="px-6 py-4">
+                          <div className="flex items-center space-x-3">
+                            <div className="w-8 h-8 bg-[#7ED957]/10 rounded-full flex items-center justify-center">
+                              <User className="w-4 h-4 text-[#7ED957]" />
+                            </div>
+                            <span className="font-medium text-slate-900">{user.name}</span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 text-slate-600">{user.email}</td>
+                        <td className="px-6 py-4">
+                          <span
+                            className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                              user.role === 'admin'
+                                ? "bg-[#7ED957]/10 text-slate-800"
+                                : "bg-slate-100 text-slate-700"
+                            }`}
+                          >
+                            {user.role === "Admin" && <Shield className="w-3 h-3 mr-1" />}
+                            {user.role}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          <button
                             onClick={() => handleDelete(user.id)}
                             disabled={isDeleting}
-                            loading={isDeleting}
+                            className="inline-flex items-center justify-center w-8 h-8 text-red-500 hover:bg-red-50 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                            title="Delete user"
                           >
-                            <TrashIcon />
-                          </ActionIcon>
-                        </Group>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </Table>
+                            {isDeleting ? (
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                            ) : (
+                              <Trash2 className="w-4 h-4" />
+                            )}
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Empty State */}
+              {users.length === 0 && (
+                <div className="text-center py-12">
+                  <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Users className="w-8 h-8 text-slate-400" />
+                  </div>
+                  <h3 className="text-lg font-medium text-slate-900 mb-2">No users found</h3>
+                  <p className="text-slate-600">There are no users to display at the moment.</p>
+                </div>
+              )}
             </div>
-          </Card>
-        )}
-      </Container>
+          )}
+        </div>
+      </div>
     </>
   );
 };

@@ -1,65 +1,18 @@
 import { useEffect } from "react";
-import {
-  Container,
-  Title,
-  Text,
-  Button,
-  Group,
-  Stack,
-  Card,
-  TextInput,
-  Table,
-  ActionIcon,
-  Loader,
-  Modal,
-} from "@mantine/core";
 import toast from 'react-hot-toast';
 import Navbar from "../components/Navbar";
 import { useAuth } from "../hooks/useAuth";
 import { useCategoryManagement } from "../hooks/useCategoryManagement";
-
-const TrashIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    strokeWidth={1.5}
-    stroke="currentColor"
-    className="w-5 h-5 hover:scale-110 transition-transform duration-200"
-  >
-    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-  </svg>
-);
-
-const EditIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    strokeWidth={1.5}
-    stroke="currentColor"
-    className="w-5 h-5 hover:scale-110 transition-transform duration-200"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"
-    />
-  </svg>
-);
-
-const PlusIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    strokeWidth={1.5}
-    stroke="currentColor"
-    className="w-5 h-5 mr-2 hover:scale-110 transition-transform duration-200"
-  >
-    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-  </svg>
-);
+import { 
+  Tag, 
+  Trash2, 
+  Edit3, 
+  Plus, 
+  Loader2, 
+  AlertCircle,
+  CheckCircle,
+  X
+} from "lucide-react";
 
 const CategoryManagement = () => {
   const { token } = useAuth();
@@ -91,125 +44,182 @@ const CategoryManagement = () => {
   return (
     <>
       <Navbar />
-      <Container fluid className="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen text-gray-900 p-4 md:p-8">
-        <Title
-          order={1}
-          className="text-2xl md:text-4xl font-extrabold text-green-400 mb-6 tracking-tight animate-fadeIn"
-        >
-          Category Management
-        </Title>
+      <div className="min-h-screen bg-gradient-to-br from-white to-[#f0f9eb] p-4 sm:p-6 lg:p-8">
+        <div className="max-w-7xl mx-auto">
+          {/* Header */}
+          <div className="mb-8">
+            <div className="flex items-center space-x-3 mb-4">
+              <div className="w-12 h-12 bg-[#7ED957]/10 rounded-xl flex items-center justify-center">
+                <Tag className="w-6 h-6 text-[#7ED957]" />
+              </div>
+              <div>
+                <h1 className="text-3xl font-bold text-slate-900">Category Management</h1>
+                <p className="text-slate-600">Manage post categories and topics</p>
+              </div>
+            </div>
+          </div>
 
-        {isLoading ? (
-          <Card className="bg-white rounded-2xl p-6 md:p-8 shadow-lg flex items-center justify-center h-64">
-            <Loader color="indigo" size="lg" />
-          </Card>
-        ) : isError ? (
-          <Card className="bg-white rounded-2xl p-6 md:p-8 shadow-lg">
-            <Text color="red">Error loading categories: {error}</Text>
-          </Card>
-        ) : (
-          <Card
-            className="bg-white rounded-2xl p-4 md:p-8 shadow-lg hover:shadow-xl transition-shadow duration-300 border border-gray-200"
-            withBorder
-          >
-            <Text size="xl" weight={700} className="mb-4 md:mb-6 text-gray-800 tracking-wide">
-              Manage Categories
-            </Text>
-            <Stack spacing="lg">
-              <Group position="apart" className="flex flex-col md:flex-row gap-4">
-                <TextInput
-                  placeholder="Category Name"
-                  value={newCategory}
-                  onChange={(e) => setNewCategory(e.target.value)}
-                  className="flex-1 bg-gray-50 text-gray-800 placeholder-gray-400 border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 w-full"
-                  variant="filled"
-                />
-                <Button
-                  onClick={() => (editingCategory ? handleUpdate() : handleAddCategory())}
-                  className="bg-green-500 text-white hover:bg-green-600 hover:scale-105 transition-all duration-300 shadow-md w-full md:w-auto"
-                  leftIcon={<PlusIcon />}
-                  disabled={!newCategory.trim() || isMutating}
-                  loading={isMutating}
-                >
-                  {editingCategory ? "Update Category" : "Add Category"}
-                </Button>
-              </Group>
+          {/* Main Content */}
+          {isLoading ? (
+            <div className="bg-white rounded-2xl shadow-xl border border-slate-200 p-8">
+              <div className="flex flex-col items-center justify-center space-y-4 h-64">
+                <Loader2 className="w-8 h-8 text-[#7ED957] animate-spin" />
+                <p className="text-slate-600">Loading categories...</p>
+              </div>
+            </div>
+          ) : isError ? (
+            <div className="bg-white rounded-2xl shadow-xl border border-slate-200 p-8">
+              <div className="flex items-center space-x-3 text-red-600">
+                <AlertCircle className="w-5 h-5" />
+                <p>Error loading categories: {error}</p>
+              </div>
+            </div>
+          ) : (
+            <div className="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
+              {/* Add Category Form */}
+              <div className="bg-slate-50 px-6 py-4 border-b border-slate-200">
+                <h2 className="text-xl font-semibold text-slate-900 mb-4">Add New Category</h2>
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <div className="flex-1">
+                    <input
+                      type="text"
+                      placeholder="Enter category name..."
+                      value={newCategory}
+                      onChange={(e) => setNewCategory(e.target.value)}
+                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#7ED957] focus:border-[#7ED957] transition-colors duration-200"
+                      disabled={isMutating}
+                    />
+                  </div>
+                  <button
+                    onClick={() => (editingCategory ? handleUpdate() : handleAddCategory())}
+                    disabled={!newCategory.trim() || isMutating}
+                    className="inline-flex items-center justify-center px-6 py-3 bg-[#7ED957] text-white font-medium rounded-lg hover:bg-[#6cc149] transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isMutating ? (
+                      <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                    ) : (
+                      <Plus className="w-4 h-4 mr-2" />
+                    )}
+                    {editingCategory ? "Update Category" : "Add Category"}
+                  </button>
+                </div>
+              </div>
+
+              {/* Categories Table */}
               <div className="overflow-x-auto">
-                <Table className="bg-gray-50 rounded-xl w-full">
-                  <thead>
-                    <tr className="bg-indigo-50 text-green-700">
-                      <th className="text-left p-2 md:p-4 font-semibold">Name</th>
-                      <th className="text-right p-2 md:p-4 font-semibold">Action</th>
+                <table className="w-full">
+                  <thead className="bg-slate-50 border-b border-slate-200">
+                    <tr>
+                      <th className="text-left px-6 py-4 text-sm font-semibold text-slate-700">
+                        <div className="flex items-center space-x-2">
+                          <Tag className="w-4 h-4" />
+                          <span>Category Name</span>
+                        </div>
+                      </th>
+                      <th className="text-right px-6 py-4 text-sm font-semibold text-slate-700">
+                        Actions
+                      </th>
                     </tr>
                   </thead>
-                  <tbody>
+                  <tbody className="divide-y divide-slate-200">
                     {categories.map((category) => (
-                      <tr
-                        key={category.id}
-                        className="border-t border-gray-200 hover:bg-indigo-50 transition-colors duration-200"
-                      >
-                        <td className="p-2 md:p-4 text-gray-800 font-medium">{category.name}</td>
-                        <td className="p-2 md:p-4 flex justify-end">
-                          <Group spacing="xs" position="right" className="ml-auto">
-                            <ActionIcon
-                              color="blue"
-                              variant="filled"
-                              size="md"
-                              className="hover:bg-green-600 hover:scale-105 transition-all duration-200"
+                      <tr key={category.id} className="hover:bg-slate-50 transition-colors duration-200">
+                        <td className="px-6 py-4">
+                          <div className="flex items-center space-x-3">
+                            <div className="w-8 h-8 bg-[#7ED957]/10 rounded-full flex items-center justify-center">
+                              <Tag className="w-4 h-4 text-[#7ED957]" />
+                            </div>
+                            <span className="font-medium text-slate-900">{category.name}</span>
+                            {editingCategory?.id === category.id && (
+                              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-[#7ED957]/10 text-slate-800">
+                                <Edit3 className="w-3 h-3 mr-1" />
+                                Editing
+                              </span>
+                            )}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          <div className="flex items-center justify-end space-x-2">
+                            <button
                               onClick={() => handleEdit(category)}
                               disabled={isMutating}
+                              className="inline-flex items-center justify-center w-8 h-8 text-blue-500 hover:bg-blue-50 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                              title="Edit category"
                             >
-                              <EditIcon />
-                            </ActionIcon>
-                            <ActionIcon
-                              color="red"
-                              variant="filled"
-                              size="md"
-                              className="hover:bg-red-600 hover:scale-105 transition-all duration-200"
+                              <Edit3 className="w-4 h-4" />
+                            </button>
+                            <button
                               onClick={() => handleDelete(category.id)}
                               disabled={isMutating}
+                              className="inline-flex items-center justify-center w-8 h-8 text-red-500 hover:bg-red-50 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                              title="Delete category"
                             >
-                              <TrashIcon />
-                            </ActionIcon>
-                          </Group>
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))}
                   </tbody>
-                </Table>
+                </table>
               </div>
-            </Stack>
-          </Card>
-        )}
 
-        {/* Delete Confirmation Modal */}
-        <Modal
-          opened={deleteModalOpen}
-          onClose={cancelDelete}
-          title={<Text size="lg" weight={700} className="text-red-500">Confirm Deletion</Text>}
-          centered
-        >
-          <Text size="md" className="mb-4">
-            Are you sure you want to delete the category{" "}
-            <span className="font-semibold">{categoryToDelete?.name}</span>?
-            <br /><br />
-            This action cannot be undone.
-          </Text>
-          <Group position="right" spacing="md" className="flex flex-col md:flex-row gap-2">
-            <Button variant="outline" onClick={cancelDelete} className="w-full md:w-auto">
-              Cancel
-            </Button>
-            <Button
-              color="red"
-              onClick={confirmDelete}
-              loading={isMutating}
-              className="w-full md:w-auto"
-            >
-              Delete
-            </Button>
-          </Group>
-        </Modal>
-      </Container>
+              {/* Empty State */}
+              {categories.length === 0 && (
+                <div className="text-center py-12">
+                  <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Tag className="w-8 h-8 text-slate-400" />
+                  </div>
+                  <h3 className="text-lg font-medium text-slate-900 mb-2">No categories found</h3>
+                  <p className="text-slate-600">Add your first category to get started.</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Delete Confirmation Modal */}
+          {deleteModalOpen && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+              <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6">
+                <div className="flex items-center space-x-3 mb-4">
+                  <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                    <AlertCircle className="w-5 h-5 text-red-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-slate-900">Confirm Deletion</h3>
+                    <p className="text-sm text-slate-600">This action cannot be undone</p>
+                  </div>
+                </div>
+                
+                <p className="text-slate-700 mb-6">
+                  Are you sure you want to delete the category{" "}
+                  <span className="font-semibold text-slate-900">"{categoryToDelete?.name}"</span>?
+                </p>
+                
+                <div className="flex space-x-3">
+                  <button
+                    onClick={cancelDelete}
+                    className="flex-1 px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors duration-200"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={confirmDelete}
+                    disabled={isMutating}
+                    className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isMutating ? (
+                      <Loader2 className="w-4 h-4 animate-spin mx-auto" />
+                    ) : (
+                      "Delete"
+                    )}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
     </>
   );
 };
