@@ -32,6 +32,8 @@ export const NotificationProvider = ({ children }) => {
       if (response.success) {
         setNotifications(response.data.notifications || []);
         setUnreadCount(response.data.unreadCount || 0);
+      } else {
+        setError(response.error || 'Failed to fetch notifications');
       }
     } catch (error) {
       console.error('Error fetching notifications:', error);
@@ -44,21 +46,25 @@ export const NotificationProvider = ({ children }) => {
   // Mark notification as read
   const markAsRead = async (notificationId) => {
     try {
-      await notificationService.markNotificationAsRead(notificationId);
+      const response = await notificationService.markNotificationAsRead(notificationId);
       
-      // Update local state
-      setNotifications(prev => 
-        prev.map(notification => 
-          notification.id === notificationId 
-            ? { ...notification, isRead: true }
-            : notification
-        )
-      );
-      
-      // Update unread count
-      setUnreadCount(prev => Math.max(0, prev - 1));
-      
-      toast.success('Notification marked as read');
+      if (response.success) {
+        // Update local state
+        setNotifications(prev => 
+          prev.map(notification => 
+            notification.id === notificationId 
+              ? { ...notification, isRead: true }
+              : notification
+          )
+        );
+        
+        // Update unread count
+        setUnreadCount(prev => Math.max(0, prev - 1));
+        
+        toast.success('Notification marked as read');
+      } else {
+        toast.error(response.error || 'Failed to mark notification as read');
+      }
     } catch (error) {
       console.error('Error marking notification as read:', error);
       toast.error('Failed to mark notification as read');
@@ -68,17 +74,21 @@ export const NotificationProvider = ({ children }) => {
   // Mark all notifications as read
   const markAllAsRead = async () => {
     try {
-      await notificationService.markAllNotificationsAsRead();
+      const response = await notificationService.markAllNotificationsAsRead();
       
-      // Update local state
-      setNotifications(prev => 
-        prev.map(notification => ({ ...notification, isRead: true }))
-      );
-      
-      // Reset unread count
-      setUnreadCount(0);
-      
-      toast.success('All notifications marked as read');
+      if (response.success) {
+        // Update local state
+        setNotifications(prev => 
+          prev.map(notification => ({ ...notification, isRead: true }))
+        );
+        
+        // Reset unread count
+        setUnreadCount(0);
+        
+        toast.success('All notifications marked as read');
+      } else {
+        toast.error(response.error || 'Failed to mark all notifications as read');
+      }
     } catch (error) {
       console.error('Error marking all notifications as read:', error);
       toast.error('Failed to mark all notifications as read');
@@ -88,20 +98,24 @@ export const NotificationProvider = ({ children }) => {
   // Delete notification
   const deleteNotification = async (notificationId) => {
     try {
-      await notificationService.deleteNotification(notificationId);
+      const response = await notificationService.deleteNotification(notificationId);
       
-      // Update local state
-      setNotifications(prev => 
-        prev.filter(notification => notification.id !== notificationId)
-      );
-      
-      // Update unread count if notification was unread
-      const deletedNotification = notifications.find(n => n.id === notificationId);
-      if (deletedNotification && !deletedNotification.isRead) {
-        setUnreadCount(prev => Math.max(0, prev - 1));
+      if (response.success) {
+        // Update local state
+        setNotifications(prev => 
+          prev.filter(notification => notification.id !== notificationId)
+        );
+        
+        // Update unread count if notification was unread
+        const deletedNotification = notifications.find(n => n.id === notificationId);
+        if (deletedNotification && !deletedNotification.isRead) {
+          setUnreadCount(prev => Math.max(0, prev - 1));
+        }
+        
+        toast.success('Notification deleted');
+      } else {
+        toast.error(response.error || 'Failed to delete notification');
       }
-      
-      toast.success('Notification deleted');
     } catch (error) {
       console.error('Error deleting notification:', error);
       toast.error('Failed to delete notification');

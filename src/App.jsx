@@ -16,6 +16,7 @@ import Profile from "./pages/Profile";
 import Error from "./pages/Error";
 import NotFound from "./pages/NotFound";
 import { AuthProvider } from "./contexts/AuthContexts";
+import { NotificationProvider } from "./contexts/NotificationContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import PublicRoute from "./components/PublicRoute";
 import { Toaster } from "react-hot-toast";
@@ -74,7 +75,8 @@ function App() {
       />
       <Router>
         <AuthProvider>
-          <Routes>
+          <NotificationProvider>
+            <Routes>
             <Route
               path="/login"
               element={
@@ -206,6 +208,7 @@ function App() {
             <Route path="/empty" element={<Error />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
+          </NotificationProvider>
         </AuthProvider>
       </Router>
     </>
