@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useSinglePost } from '../hooks/useSinglePost';
 import { useCreateComment } from '../hooks/useCreateComment';
@@ -23,6 +23,22 @@ const CommentCard = ({ comment, postId, isPostOwner, bestAnswerId }) => {
   const toggleBestAnswerMutation = useToggleBestAnswer(postId);
   const [isEditing, setIsEditing] = useState(false);
   const [editedContent, setEditedContent] = useState(comment.content);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const dropdownRef = useRef(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   const isBestAnswer = bestAnswerId === comment.id;
   const isCommentOwner = user && comment.user?.id === user.id;
@@ -134,41 +150,55 @@ const CommentCard = ({ comment, postId, isPostOwner, bestAnswerId }) => {
 
             {/* Action Menu */}
             {(isCommentOwner || isPostOwner) && (
-              <div className="relative">
-                <button className="p-2 text-slate-400 hover:text-slate-600 transition-colors">
+              <div className="relative" ref={dropdownRef}>
+                <button 
+                  onClick={() => setShowDropdown(!showDropdown)}
+                  className="p-2 text-slate-400 hover:text-slate-600 transition-colors"
+                >
                   <CiMenuKebab className="text-lg" />
                 </button>
-                <div className="absolute right-0 top-full mt-1 bg-white border border-slate-200 rounded-xl shadow-lg py-1 z-10 min-w-[120px]">
-                  {isCommentOwner && (
-                    <button
-                      onClick={() => setIsEditing(true)}
-                      className="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 flex items-center"
-                    >
-                      <FaEdit className="mr-2 text-xs" />
-                      Edit
-                    </button>
-                  )}
-                  {isCommentOwner && (
-                    <button
-                      onClick={handleDelete}
-                      className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center"
-                    >
-                      <FaTrash className="mr-2 text-xs" />
-                      Delete
-                    </button>
-                  )}
-                  {isPostOwner && (
-                    <button
-                      onClick={handleToggleBestAnswer}
-                      className={`w-full text-left px-4 py-2 text-sm flex items-center ${
-                        isBestAnswer ? 'text-orange-600 hover:bg-orange-50' : 'text-green-600 hover:bg-green-50'
-                      }`}
-                    >
-                      <FaCheckCircle className="mr-2 text-xs" />
-                      {isBestAnswer ? 'Unmark Best Answer' : 'Mark Best Answer'}
-                    </button>
-                  )}
-                </div>
+                {showDropdown && (
+                  <div className="absolute right-0 top-full mt-1 bg-white border border-slate-200 rounded-xl shadow-lg py-1 z-10 min-w-[120px]">
+                    {isCommentOwner && (
+                      <button
+                        onClick={() => {
+                          setIsEditing(true);
+                          setShowDropdown(false);
+                        }}
+                        className="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 flex items-center"
+                      >
+                        <FaEdit className="mr-2 text-xs" />
+                        Edit
+                      </button>
+                    )}
+                    {isCommentOwner && (
+                      <button
+                        onClick={() => {
+                          handleDelete();
+                          setShowDropdown(false);
+                        }}
+                        className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center"
+                      >
+                        <FaTrash className="mr-2 text-xs" />
+                        Delete
+                      </button>
+                    )}
+                    {isPostOwner && (
+                      <button
+                        onClick={() => {
+                          handleToggleBestAnswer();
+                          setShowDropdown(false);
+                        }}
+                        className={`w-full text-left px-4 py-2 text-sm flex items-center ${
+                          isBestAnswer ? 'text-orange-600 hover:bg-orange-50' : 'text-green-600 hover:bg-green-50'
+                        }`}
+                      >
+                        <FaCheckCircle className="mr-2 text-xs" />
+                        {isBestAnswer ? 'Unmark Best Answer' : 'Mark Best Answer'}
+                      </button>
+                    )}
+                  </div>
+                )}
               </div>
             )}
           </div>

@@ -29,7 +29,7 @@ import UserProfile from "./pages/Profile";
 import UserManagement from "./pages/UserManagement";
 import CategoryManagement from "./pages/CategoryManagement";
 import Admin from "./pages/Admin";
-import Leaderboard from "./pages/LeaderboardPage";
+import Leaderboard from "./pages/Leaderboard";
 import NotificationsPage from "./pages/NotificationsPage";
 import SavedPostsPage from "./pages/SavedPostsPage";
 import ChatRoomsPage from "./pages/ChatRoomsPage";
