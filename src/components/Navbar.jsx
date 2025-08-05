@@ -1,4 +1,4 @@
-import { ChevronDown, Menu, X, LogOut, User, Settings, Shield, Home, FileText, MessageSquare, Info, Trophy, Users, MessageCircle } from "lucide-react";
+import { ChevronDown, Menu, X, LogOut, User, Settings, Shield, Home, FileText, MessageSquare, Info, Trophy, Users, MessageCircle, Bookmark } from "lucide-react";
 import NotificationDropdown from "./NotificationDropdown";
 import Logo from "../assets/CodeConnect.svg";
 import { NavLink, useNavigate } from "react-router-dom";
@@ -39,6 +39,7 @@ const Navbar = () => {
   const myContentItems = [
     { path: "/my-posts", label: "My Posts", icon: <FileText className="w-4 h-4" /> },
     { path: "/my-comments", label: "My Comments", icon: <MessageSquare className="w-4 h-4" /> },
+    { path: "/saved-posts", label: "Saved Posts", icon: <Bookmark className="w-4 h-4" /> },
   ];
 
   const navigationItems = [

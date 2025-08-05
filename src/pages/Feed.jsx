@@ -6,6 +6,7 @@ import SearchComponent from '../components/Feed/SearchComponent';
 import PostComponent from '../components/Feed/PostComponent';
 import FilterComponent from '../components/Feed/FilterComponent';
 import AddPostComponent from '../components/Feed/AddPostComponent';
+import SavedPostsSection from '../components/Feed/SavedPostsSection';
 import { FaStar, FaRocket, FaUsers, FaCode, FaCalendar, FaUniversity, FaClock, FaTrophy, FaUser } from 'react-icons/fa';
 import HashLoader from 'react-spinners/HashLoader';
 import toast from 'react-hot-toast';
@@ -359,6 +360,9 @@ const FeedPage = () => {
                     )}
                   </div>
                 </div>
+
+                {/* Saved Posts Section */}
+                <SavedPostsSection />
               </div>
             </div>
           </div>

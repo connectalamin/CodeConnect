@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import hljs from "highlight.js";
 import "highlight.js/styles/github-dark.css";
 import { useCategoryManagement } from "../../hooks/useCategoryManagement";
+import { useSavedPosts } from "../../hooks/useSavedPosts";
 import { 
   ThumbsUp, 
   ThumbsDown, 
@@ -12,7 +13,9 @@ import {
   User, 
   Eye,
   Lock,
-  Globe
+  Globe,
+  Bookmark,
+  BookmarkCheck
 } from "lucide-react";
 
 hljs.configure({
@@ -46,7 +49,9 @@ const PostComponent = ({ post, onVote, isPostOwner }) => {
   const navigate = useNavigate();
   const [highlightedContent, setHighlightedContent] = useState("");
   const [isCode, setIsCode] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
   const { categories } = useCategoryManagement();
+  const { savePost, unsavePost, checkIfSaved } = useSavedPosts();
 
   useEffect(() => {
     if (!post.content) return;
@@ -73,12 +78,41 @@ const PostComponent = ({ post, onVote, isPostOwner }) => {
     }
   }, [post.content]);
 
+  // Check if post is saved on mount
+  useEffect(() => {
+    const checkSavedStatus = async () => {
+      if (post.id) {
+        const saved = await checkIfSaved(post.id);
+        setIsSaved(saved);
+      }
+    };
+    checkSavedStatus();
+  }, [post.id, checkIfSaved]);
+
   const userRank = getRank(post.user.karmaPoints);
+  
   const handlePostVote = (voteType) => {
     const value = voteType === "up" ? 1 : -1;
     if (onVote) onVote(voteType);
     else castVoteOnPostMutation.mutate({ value });
   };
+
+  const handleSavePost = async () => {
+    if (!post.id) return;
+    
+    if (isSaved) {
+      const success = await unsavePost(post.id);
+      if (success) {
+        setIsSaved(false);
+      }
+    } else {
+      const success = await savePost(post.id);
+      if (success) {
+        setIsSaved(true);
+      }
+    }
+  };
+
   const postCategory = categories.find((category) => category.id === post.categoryId);
 
   const formatDate = (dateString) => {
@@ -216,6 +250,21 @@ const PostComponent = ({ post, onVote, isPostOwner }) => {
                 <span className="text-sm font-medium">{post.comments?.length || 0}</span>
               </div>
             )}
+
+            {/* Save Post */}
+            <button
+              onClick={handleSavePost}
+              className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-[#7ED957]/10 hover:text-[#7ED957] transition-all duration-200 group"
+            >
+              {isSaved ? (
+                <BookmarkCheck className="w-4 h-4 text-[#7ED957] group-hover:scale-110 transition-transform duration-200" />
+              ) : (
+                <Bookmark className="w-4 h-4 group-hover:scale-110 transition-transform duration-200" />
+              )}
+              <span className="text-sm font-medium text-slate-700">
+                {isSaved ? 'Saved' : 'Save'}
+              </span>
+            </button>
           </div>
 
           {/* View Post Link */}
