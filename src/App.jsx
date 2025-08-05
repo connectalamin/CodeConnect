@@ -9,6 +9,9 @@ import {
 import { useState, useEffect } from "react";
 import Login from "./auth/pages/Login";
 import Signup from "./auth/pages/Signup";
+import ForgotPassword from "./auth/pages/ForgotPassword";
+import ResetPassword from "./auth/pages/ResetPassword";
+import VerifyEmail from "./pages/VerifyEmail";
 import Home from "./pages/Home";
 import "./App.css";
 import About from "./pages/About";
@@ -90,6 +93,30 @@ function App() {
               element={
                 <PublicRoute>
                   <Signup />
+                </PublicRoute>
+              }
+            />
+            <Route
+              path="/forgot-password"
+              element={
+                <PublicRoute>
+                  <ForgotPassword />
+                </PublicRoute>
+              }
+            />
+            <Route
+              path="/reset-password"
+              element={
+                <PublicRoute>
+                  <ResetPassword />
+                </PublicRoute>
+              }
+            />
+            <Route
+              path="/verify-email"
+              element={
+                <PublicRoute>
+                  <VerifyEmail />
                 </PublicRoute>
               }
             />
