@@ -1,4 +1,4 @@
-import { ChevronDown, Menu, X, LogOut, User, Settings, Shield, Home, FileText, MessageSquare, Info, Trophy, Users, MessageCircle, Bookmark } from "lucide-react";
+import { ChevronDown, Menu, X, LogOut, User, Settings, Shield, Home, FileText, MessageSquare, Info, Trophy, Users, MessageCircle, Bookmark, HelpCircle } from "lucide-react";
 import NotificationDropdown from "./NotificationDropdown";
 import Logo from "../assets/CodeConnect.svg";
 import { NavLink, useNavigate } from "react-router-dom";
@@ -34,6 +34,7 @@ const Navbar = () => {
     { path: "/profile", label: "View Profile", icon: <User className="w-4 h-4" /> },
     { path: "/edit-profile", label: "Update Profile", icon: <Settings className="w-4 h-4" /> },
     { path: "/about", label: "About the Site", icon: <Info className="w-4 h-4" /> },
+    { path: "/faq", label: "FAQ", icon: <HelpCircle className="w-4 h-4" /> },
   ];
 
   const myContentItems = [
@@ -48,7 +49,10 @@ const Navbar = () => {
       { path: "/leaderboard", label: "Leaderboard", icon: <Trophy className="w-4 h-4" /> },
       { path: "/chat-rooms", label: "Chat Rooms", icon: <MessageCircle className="w-4 h-4" /> },
     ] : []),
-    ...(isAuthenticated() ? [] : [{ path: "/about", label: "About", icon: <Info className="w-4 h-4" /> }]),
+    ...(isAuthenticated() ? [] : [
+      { path: "/about", label: "About", icon: <Info className="w-4 h-4" /> },
+      { path: "/faq", label: "FAQ", icon: <HelpCircle className="w-4 h-4" /> }
+    ]),
   ];
 
   return (

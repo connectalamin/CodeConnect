@@ -1,0 +1,129 @@
+{
+  "general": [
+    {
+      "id": "what-is-codeconnect",
+      "question": "What is CodeConnect?",
+      "answer": "CodeConnect is a collaborative platform designed specifically for developers, students, and teachers. It's your hub for debugging smarter, sharing knowledge, and building a stronger coding community. Whether you're stuck on a coding problem, want to share your expertise, or looking to learn from others, CodeConnect provides the perfect environment for meaningful collaboration."
+    },
+    {
+      "id": "who-can-use",
+      "question": "Who can use CodeConnect?",
+      "answer": "CodeConnect is designed for anyone involved in programming and software development - from beginners taking their first coding steps to experienced developers working on complex projects. Students can get help with assignments, teachers can share resources and answer questions, and professionals can collaborate on challenging problems."
+    },
+    {
+      "id": "getting-started",
+      "question": "How do I get started?",
+      "answer": "Getting started is easy! Simply sign up for a free account, complete your profile with your interests and expertise areas, and you're ready to start asking questions, sharing knowledge, and connecting with the community. We recommend browsing existing posts to get familiar with the platform culture."
+    }
+  ],
+  "features": [
+    {
+      "id": "post-questions",
+      "question": "How do I post a question?",
+      "answer": "Navigate to the Feed page and click 'Create Post'. Write a clear, descriptive title and provide detailed information about your problem. Include relevant code snippets, error messages, and what you've already tried. Choose appropriate categories to help others find and answer your question. The more specific you are, the better help you'll receive!"
+    },
+    {
+      "id": "answer-questions",
+      "question": "How do I answer questions?",
+      "answer": "Browse the Feed to find questions in your area of expertise. Click on any post to view details and add your response in the comments section. Provide clear, helpful answers with code examples when relevant. If your answer solves the problem, the question author may mark it as the 'Best Answer'."
+    },
+    {
+      "id": "categories",
+      "question": "What categories are available?",
+      "answer": "CodeConnect offers various categories to organize content effectively, including JavaScript, Python, React, Node.js, CSS, HTML, Database, Mobile Development, Web Development, DevOps, and many more. Categories help users find relevant content quickly and connect with others who share similar interests."
+    },
+    {
+      "id": "search-filter",
+      "question": "How do I search and filter content?",
+      "answer": "Use the search bar at the top of the Feed page to find specific topics, questions, or users. You can filter posts by categories, sort by newest, most popular, or most answered. The advanced filtering options help you discover exactly what you're looking for."
+    },
+    {
+      "id": "save-posts",
+      "question": "Can I save posts for later?",
+      "answer": "Yes! Click the bookmark icon on any post to save it to your 'Saved Posts' collection. Access your saved posts anytime from the 'My Content' dropdown menu in the navigation bar. This feature is perfect for keeping track of helpful solutions or interesting discussions."
+    }
+  ],
+  "karma": [
+    {
+      "id": "what-is-karma",
+      "question": "What are Karma Points?",
+      "answer": "Karma Points are a measure of your positive contributions to the CodeConnect community. You earn karma by posting helpful questions, providing valuable answers, and engaging constructively with other members. Your karma score reflects your reputation and expertise within the community."
+    },
+    {
+      "id": "how-to-earn-karma",
+      "question": "How do I earn Karma Points?",
+      "answer": "You can earn Karma Points in several ways: +10 points for posting a question, +15 points when your answer is marked as 'Best Answer', +5 points for receiving upvotes on your posts or comments, and +3 points for your upvotes on others' content. Consistent, helpful participation is the key to building karma."
+    },
+    {
+      "id": "karma-benefits",
+      "question": "What are the benefits of having high Karma?",
+      "answer": "Higher karma increases your visibility and credibility in the community. It shows other users that you're a trusted, helpful member. While karma doesn't unlock special features currently, it serves as recognition for your valuable contributions and can help establish your reputation as a knowledgeable developer."
+    },
+    {
+      "id": "lose-karma",
+      "question": "Can I lose Karma Points?",
+      "answer": "Currently, the karma system is designed to reward positive contributions, and you won't lose karma for typical activities. However, consistently unhelpful or spam-like behavior may be addressed by community moderation. Focus on providing quality content and helpful interactions to maintain and grow your karma."
+    }
+  ],
+  "ranking": [
+    {
+      "id": "ranking-system",
+      "question": "How does the ranking system work?",
+      "answer": "CodeConnect features a leaderboard that ranks users based on their Karma Points and overall contributions to the community. Rankings are updated regularly and showcase the most active and helpful community members. This gamification element encourages quality participation and recognizes top contributors."
+    },
+    {
+      "id": "leaderboard-access",
+      "question": "Where can I see the leaderboard?",
+      "answer": "The leaderboard is accessible from the main navigation menu when you're logged in. Click on 'Leaderboard' to see the current rankings, including top contributors, most helpful answerers, and rising stars in the community. You can also see your own ranking and progress."
+    },
+    {
+      "id": "ranking-factors",
+      "question": "What factors affect my ranking?",
+      "answer": "Your ranking is primarily based on your total Karma Points, which are earned through quality contributions like helpful answers, well-received questions, and positive community interactions. The system also considers the recency of your activity and the impact of your contributions."
+    }
+  ],
+  "community": [
+    {
+      "id": "chat-rooms",
+      "question": "Are there chat rooms available?",
+      "answer": "Yes! CodeConnect features real-time chat rooms where you can have instant conversations with other developers. These are perfect for quick questions, brainstorming sessions, or just connecting with fellow coders. Access chat rooms from the main navigation when you're logged in."
+    },
+    {
+      "id": "best-answer",
+      "question": "What is the 'Best Answer' feature?",
+      "answer": "When you post a question, you can mark one reply as the 'Best Answer' - the response that best solved your problem. This helps other users quickly find the most effective solution and rewards the helpful community member with bonus karma points. Only the question author can designate the best answer."
+    },
+    {
+      "id": "community-guidelines",
+      "question": "What are the community guidelines?",
+      "answer": "CodeConnect promotes respectful, constructive interaction. Be helpful and kind, provide detailed questions and answers, avoid spam or off-topic content, respect others' code and intellectual property, and use appropriate categories and tags. Our goal is to create a welcoming environment where everyone can learn and grow."
+    },
+    {
+      "id": "reporting-issues",
+      "question": "How do I report inappropriate content or users?",
+      "answer": "If you encounter spam, inappropriate content, or behavior that violates community guidelines, you can report it to the moderators. Look for report options near posts or comments, or contact the administrative team directly. We take community standards seriously and will address issues promptly."
+    }
+  ],
+  "technical": [
+    {
+      "id": "profile-management",
+      "question": "How do I manage my profile?",
+      "answer": "Access your profile settings through the dropdown menu next to your profile picture. You can update your personal information, bio, profile picture, areas of expertise, and privacy settings. A complete profile helps other users understand your background and expertise areas."
+    },
+    {
+      "id": "notifications",
+      "question": "How do notifications work?",
+      "answer": "CodeConnect sends notifications for important activities like replies to your posts, comments on your questions, when your answer is marked as 'Best Answer', and other relevant community interactions. You can customize your notification preferences in your account settings."
+    },
+    {
+      "id": "mobile-access",
+      "question": "Can I access CodeConnect on mobile devices?",
+      "answer": "Yes! CodeConnect is designed to be fully responsive and works great on all devices - desktop, tablet, and mobile. The interface adapts seamlessly to your screen size, ensuring you can participate in the community wherever you are."
+    },
+    {
+      "id": "data-privacy",
+      "question": "How is my data protected?",
+      "answer": "We take your privacy seriously. Your personal information is securely stored and never shared with third parties without your consent. You control what information is public on your profile, and you can update or delete your account at any time. We follow industry best practices for data security."
+    }
+  ]
+}

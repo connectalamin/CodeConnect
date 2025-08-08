@@ -36,6 +36,7 @@ import Leaderboard from "./pages/Leaderboard";
 import NotificationsPage from "./pages/NotificationsPage";
 import SavedPostsPage from "./pages/SavedPostsPage";
 import ChatRoomsPage from "./pages/ChatRoomsPage";
+import FAQ from "./pages/FAQ";
 
 function App() {
   const [authReady, setAuthReady] = useState(false);
@@ -129,6 +130,7 @@ function App() {
               }
             />
             <Route path="/about" element={<About />} />
+            <Route path="/faq" element={<FAQ />} />
             <Route
               path="/profile"
               element={

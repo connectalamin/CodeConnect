@@ -89,17 +89,7 @@ const About = () => {
               </div>
             </div>
 
-            {/* Project info with modern card */}
-            <div className="bg-white p-4 rounded-2xl shadow-lg border border-slate-200">
-              <h2 className="text-lg md:text-xl font-bold text-slate-900 mb-2">
-                As a Semester Project
-              </h2>
-              <p className="text-slate-600 leading-relaxed text-sm">
-                Developed as part of an academic semester, <span className="font-semibold text-[#5caa3b]">CodeConnect</span> showcases innovative solutions for tech collaboration.
-              </p>
-            </div>
-          </div>
-
+ </div>
           {/* Right side image with modern styling */}
           <div className="w-full md:w-1/2 flex justify-center items-center">
             <div className="relative group">
