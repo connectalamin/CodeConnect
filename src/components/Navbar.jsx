@@ -28,6 +28,7 @@ const Navbar = () => {
   const adminMenuItems = [
     { path: "/admin/users", label: "User Management", icon: <User className="w-4 h-4" /> },
     { path: "/admin/categories", label: "Category Management", icon: <Settings className="w-4 h-4" /> },
+  { path: "/admin/chat-rooms", label: "Chat Room Management", icon: <MessageCircle className="w-4 h-4" /> },
   ];
 
   const userMenuItems = [

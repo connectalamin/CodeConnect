@@ -51,6 +51,12 @@ const Admin = () => {
       icon: <Tag className="w-4 h-4" />,
       count: categoryCount
     },
+    {
+      path: '/admin/chat-rooms',
+      label: 'Chat Rooms',
+      icon: <Shield className="w-4 h-4" />,
+      count: undefined
+    },
   ];
 
   const handleLogout = async () => {

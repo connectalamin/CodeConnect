@@ -37,6 +37,7 @@ import NotificationsPage from "./pages/NotificationsPage";
 import SavedPostsPage from "./pages/SavedPostsPage";
 import ChatRoomsPage from "./pages/ChatRoomsPage";
 import FAQ from "./pages/FAQ";
+import ChatRoomManagement from "./pages/ChatRoomManagement";
 
 function App() {
   const [authReady, setAuthReady] = useState(false);
@@ -225,6 +226,7 @@ function App() {
               <Route index element={<Navigate to="/admin/users" replace />} />
               <Route path="users" element={<UserManagement />} />
               <Route path="categories" element={<CategoryManagement />} />
+              <Route path="chat-rooms" element={<ChatRoomManagement />} />
             </Route>
             <Route
               path="/post/:postId"

@@ -69,9 +69,10 @@ export function AuthProvider({ children }) {
   };
 
   const isAuthenticated = () => !!token;
+  const getToken = () => token;
   const role = user?.role || ""; // Provide role as a string
 
-  const value = { token, user, login, logout, isAuthenticated, role };
+  const value = { token, user, login, logout, isAuthenticated, getToken, role };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

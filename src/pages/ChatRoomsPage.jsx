@@ -1,13 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "../hooks/useAuth";
+import { useChatRooms } from "../hooks/useChatRooms";
+import { useChatSocket } from "../hooks/useChatSocket";
 import Navbar from "../components/Navbar";
 import { HashLoader } from "react-spinners";
 import { 
   MessageCircle, 
   Users, 
-  Lock, 
   Globe, 
-  Plus, 
   Search, 
   Filter,
   Clock,
@@ -22,101 +22,44 @@ import {
 } from "lucide-react";
 
 const ChatRoomsPage = () => {
-  const { isAuthenticated } = useAuth();
-  const [isLoading, setIsLoading] = useState(false);
+  const { isAuthenticated, role } = useAuth();
+  const {
+    publicRooms,
+    statistics,
+    isLoading,
+    error,
+    joinRoom,
+    refreshData,
+    fetchPublicRooms
+  } = useChatRooms();
+  
+  const {
+    isConnected,
+    currentRoom,
+    messages,
+    onlineUsers,
+    typingUsers,
+    joinRoom: socketJoinRoom,
+    leaveRoom: socketLeaveRoom,
+    sendMessage: socketSendMessage,
+    handleTyping,
+    fetchRoomMessages,
+    setMessages
+  } = useChatSocket();
+
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedFilter, setSelectedFilter] = useState("all");
-  const [showCreateRoom, setShowCreateRoom] = useState(false);
-  const [joinCode, setJoinCode] = useState("");
+  const [roomMessages, setRoomMessages] = useState([]);
+  // Added missing state definitions
+  const [selectedFilter, setSelectedFilter] = useState('all');
   const [activeRoom, setActiveRoom] = useState(null);
-  const [message, setMessage] = useState("");
-  const [newRoomData, setNewRoomData] = useState({
-    name: "",
-    description: "",
-    isPrivate: false,
-    category: "Frontend"
-  });
+  const [message, setMessage] = useState('');
 
-  // Mock data for demonstration
-  const mockPublicRooms = [
-    {
-      id: 1,
-      name: "React Development",
-      category: "Frontend",
-      description: "Discuss React, hooks, and modern frontend development",
-      participants: 45,
-      isOnline: true,
-      lastMessage: "Anyone tried the new React 19 features?",
-      lastMessageTime: "2m ago",
-      messages: [
-        { id: 1, user: "Sarah Johnson", message: "Anyone tried the new React 19 features?", time: "2m ago" },
-        { id: 2, user: "Mike Chen", message: "The concurrent features are amazing!", time: "1m ago" }
-      ]
-    },
-    {
-      id: 2,
-      name: "Node.js Backend",
-      category: "Backend",
-      description: "Server-side development with Node.js and Express",
-      participants: 32,
-      isOnline: true,
-      lastMessage: "Best practices for API design?",
-      lastMessageTime: "5m ago",
-      messages: [
-        { id: 3, user: "Alex Rodriguez", message: "Best practices for API design?", time: "5m ago" },
-        { id: 4, user: "David Wilson", message: "I recommend using OpenAPI specs", time: "3m ago" }
-      ]
-    },
-    {
-      id: 3,
-      name: "TypeScript Tips",
-      category: "Programming",
-      description: "Advanced TypeScript patterns and best practices",
-      participants: 28,
-      isOnline: true,
-      lastMessage: "Generic constraints are so powerful!",
-      lastMessageTime: "10m ago",
-      messages: [
-        { id: 5, user: "Emma Davis", message: "Generic constraints are so powerful!", time: "10m ago" }
-      ]
-    }
-  ];
-
-  const mockPrivateRooms = [
-    {
-      id: 4,
-      name: "Project Alpha",
-      code: "ALPHA2024",
-      description: "Private room for Project Alpha team",
-      participants: 8,
-      isOnline: true,
-      lastMessage: "Meeting at 3 PM today",
-      lastMessageTime: "1h ago",
-      messages: [
-        { id: 6, user: "Team Lead", message: "Meeting at 3 PM today", time: "1h ago" }
-      ]
-    },
-    {
-      id: 5,
-      name: "Study Group",
-      code: "STUDY123",
-      description: "Study group for algorithms",
-      participants: 12,
-      isOnline: false,
-      lastMessage: "Great session today!",
-      lastMessageTime: "2h ago",
-      messages: [
-        { id: 7, user: "Study Buddy", message: "Great session today!", time: "2h ago" }
-      ]
-    }
-  ];
-
+  // Categories for filtering (public rooms only)
   const categories = [
-    { id: "all", label: "All Rooms", count: mockPublicRooms.length + mockPrivateRooms.length },
-    { id: "frontend", label: "Frontend", count: 1 },
-    { id: "backend", label: "Backend", count: 1 },
-    { id: "programming", label: "Programming", count: 1 },
-    { id: "private", label: "Private", count: mockPrivateRooms.length }
+    { id: "all", label: "All Rooms", count: publicRooms.length },
+    { id: "Frontend", label: "Frontend", count: publicRooms.filter(r => r.category === 'Frontend').length },
+    { id: "Backend", label: "Backend", count: publicRooms.filter(r => r.category === 'Backend').length },
+    { id: "Programming", label: "Programming", count: publicRooms.filter(r => r.category === 'Programming').length }
   ];
 
   const formatDate = (dateString) => {
@@ -137,74 +80,75 @@ const ChatRoomsPage = () => {
   };
 
   const getFilteredRooms = () => {
-    const allRooms = [...mockPublicRooms, ...mockPrivateRooms];
-    return allRooms.filter(room => {
-      if (selectedFilter === "all") return true;
-      if (selectedFilter === "private" && room.code) return true;
-      if (selectedFilter === "frontend" && room.category === "Frontend") return true;
-      if (selectedFilter === "backend" && room.category === "Backend") return true;
-      if (selectedFilter === "programming" && room.category === "Programming") return true;
-      return false;
-    });
+    let allRooms = publicRooms;
+
+    if (selectedFilter !== "all") {
+      allRooms = publicRooms.filter(room => room.category === selectedFilter);
+    }
+
+    if (searchQuery) {
+      allRooms = allRooms.filter(room => 
+        room.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        room.description.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
+    return allRooms;
   };
 
-  const handleJoinRoom = (room) => {
-    setActiveRoom(room);
+  const handleJoinRoom = async (room) => {
+    try {
+      setActiveRoom(room);
+      socketJoinRoom(room.id);
+      
+      // Fetch room messages
+      const roomData = await fetchRoomMessages(room.id);
+      setRoomMessages(roomData.messages || []);
+    } catch (error) {
+      console.error('Error joining room:', error);
+    }
   };
 
   const handleSendMessage = () => {
     if (message.trim() && activeRoom) {
-      // In real app, this would send to backend
-      console.log("Sending message:", message);
+      console.log('Sending message:', message.trim(), 'to room:', activeRoom.id);
+      socketSendMessage(activeRoom.id, message);
       setMessage("");
     }
   };
 
-  const copyRoomCode = (code) => {
-    navigator.clipboard.writeText(code);
-    // Show toast notification
-  };
+  // copyRoomCode removed (no room codes in public-only version)
 
-  const handleCreateRoom = () => {
-    if (newRoomData.name.trim() && newRoomData.description.trim()) {
-      // Generate a random room code for private rooms
-      const roomCode = newRoomData.isPrivate ? Math.random().toString(36).substring(2, 8).toUpperCase() : null;
-      
-      const newRoom = {
-        id: Date.now(),
-        name: newRoomData.name,
-        category: newRoomData.category,
-        description: newRoomData.description,
-        code: roomCode,
-        participants: 1,
-        isOnline: true,
-        lastMessage: "Room created!",
-        lastMessageTime: "now",
-        messages: [
-          { id: Date.now(), user: "You", message: "Room created!", time: "now" }
-        ]
-      };
+  // Room creation removed per requirements
 
-      // Add to appropriate array
-      if (newRoomData.isPrivate) {
-        mockPrivateRooms.unshift(newRoom);
-      } else {
-        mockPublicRooms.unshift(newRoom);
+  // Filter rooms when search or filter changes (debounced to avoid flicker)
+  useEffect(() => {
+    const controller = new AbortController();
+    const id = setTimeout(() => {
+      const filters = {};
+      if (selectedFilter !== 'all' && selectedFilter !== 'private') {
+        filters.category = selectedFilter;
       }
+      if (searchQuery) {
+        filters.search = searchQuery;
+      }
+      fetchPublicRooms(filters);
+    }, 250);
+    return () => {
+      clearTimeout(id);
+      controller.abort?.();
+    };
+  }, [searchQuery, selectedFilter]);
 
-      // Reset form and close modal
-      setNewRoomData({
-        name: "",
-        description: "",
-        isPrivate: false,
-        category: "Frontend"
-      });
-      setShowCreateRoom(false);
-      
-      // Auto-join the new room
-      setActiveRoom(newRoom);
+  // Update room messages when socket messages change
+  useEffect(() => {
+    if (activeRoom && messages.length > 0) {
+      const roomSpecificMessages = messages.filter(msg => msg.roomId === activeRoom.id);
+      if (roomSpecificMessages.length > 0) {
+        setRoomMessages(prev => [...prev, ...roomSpecificMessages]);
+      }
     }
-  };
+  }, [messages, activeRoom]);
 
   if (!isAuthenticated()) {
     return (
@@ -237,39 +181,26 @@ const ChatRoomsPage = () => {
                 </div>
                 <div>
                   <h1 className="text-3xl font-bold text-slate-900">Chat Rooms</h1>
-                  <p className="text-slate-600">Join public discussions or create private rooms</p>
+                  <p className="text-slate-600">
+                    Join public discussions in community rooms
+                    {!isConnected && <span className="text-red-500 ml-2">(Disconnected)</span>}
+                    {isConnected && <span className="text-green-500 ml-2">(Connected)</span>}
+                  </p>
                 </div>
               </div>
-              <button
-                onClick={() => setShowCreateRoom(true)}
-                className="px-6 py-3 bg-[#7ED957] text-white rounded-lg hover:bg-[#6cc149] transition-colors font-medium flex items-center gap-2"
-              >
-                <Plus className="w-4 h-4" />
-                Create Room
-              </button>
+              {/* Admin create room button removed */}
             </div>
             
             {/* Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
               <div className="bg-white rounded-xl p-4 shadow-sm border border-slate-200">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-[#7ED957]/20 rounded-full flex items-center justify-center">
                     <Globe className="w-5 h-5 text-[#7ED957]" />
                   </div>
                   <div>
-                    <div className="text-2xl font-bold text-slate-900">{mockPublicRooms.length}</div>
+                    <div className="text-2xl font-bold text-slate-900">{statistics.publicRooms || 0}</div>
                     <div className="text-sm text-slate-600">Public Rooms</div>
-                  </div>
-                </div>
-              </div>
-              <div className="bg-white rounded-xl p-4 shadow-sm border border-slate-200">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                    <Lock className="w-5 h-5 text-blue-600" />
-                  </div>
-                  <div>
-                    <div className="text-2xl font-bold text-slate-900">{mockPrivateRooms.length}</div>
-                    <div className="text-sm text-slate-600">Private Rooms</div>
                   </div>
                 </div>
               </div>
@@ -279,11 +210,8 @@ const ChatRoomsPage = () => {
                     <Users className="w-5 h-5 text-green-600" />
                   </div>
                   <div>
-                    <div className="text-2xl font-bold text-slate-900">
-                      {mockPublicRooms.reduce((sum, room) => sum + room.participants, 0) + 
-                       mockPrivateRooms.reduce((sum, room) => sum + room.participants, 0)}
-                    </div>
-                    <div className="text-sm text-slate-600">Total Participants</div>
+                    <div className="text-2xl font-bold text-slate-900">{statistics.totalRooms || 0}</div>
+                    <div className="text-sm text-slate-600">Your Rooms</div>
                   </div>
                 </div>
               </div>
@@ -293,34 +221,11 @@ const ChatRoomsPage = () => {
                     <MessageCircle className="w-5 h-5 text-purple-600" />
                   </div>
                   <div>
-                    <div className="text-2xl font-bold text-slate-900">
-                      {mockPublicRooms.reduce((sum, room) => sum + room.messages.length, 0) + 
-                       mockPrivateRooms.reduce((sum, room) => sum + room.messages.length, 0)}
-                    </div>
+                    <div className="text-2xl font-bold text-slate-900">{statistics.totalMessages || 0}</div>
                     <div className="text-sm text-slate-600">Total Messages</div>
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
-
-          {/* Join Private Room */}
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-6">
-            <div className="flex items-center gap-3 mb-4">
-              <Lock className="w-5 h-5 text-slate-600" />
-              <h3 className="text-lg font-semibold text-slate-900">Join Private Room</h3>
-            </div>
-            <div className="flex gap-3">
-              <input
-                type="text"
-                placeholder="Enter room code..."
-                value={joinCode}
-                onChange={(e) => setJoinCode(e.target.value)}
-                className="flex-1 px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-[#7ED957]/20 focus:border-[#7ED957] outline-none transition-colors"
-              />
-              <button className="px-6 py-2 bg-[#7ED957] text-white rounded-lg hover:bg-[#6cc149] transition-colors font-medium">
-                Join
-              </button>
             </div>
           </div>
 
@@ -383,37 +288,19 @@ const ChatRoomsPage = () => {
                       >
                         <div className="flex items-start justify-between mb-2">
                           <div className="flex items-center gap-2">
-                            {room.code ? (
-                              <Lock className="w-4 h-4 text-slate-500" />
-                            ) : (
-                              <Globe className="w-4 h-4 text-slate-500" />
-                            )}
+                            <Globe className="w-4 h-4 text-slate-500" />
                             <h4 className="font-semibold text-slate-900">{room.name}</h4>
                           </div>
                           <div className="flex items-center gap-1 text-xs text-slate-500">
                             <Users className="w-3 h-3" />
-                            <span>{room.participants}</span>
+                            <span>{room.memberCount ?? room._count?.members ?? 0}</span>
                           </div>
                         </div>
                         <p className="text-sm text-slate-600 mb-2">{room.description}</p>
                         <div className="flex items-center justify-between text-xs text-slate-500">
-                          <span>{room.lastMessage}</span>
-                          <span>{room.lastMessageTime}</span>
+                          <span>{room.messageCount ?? 0} messages</span>
+                          <span>{formatDate(room.createdAt)}</span>
                         </div>
-                        {room.code && (
-                          <div className="mt-2 flex items-center gap-2">
-                            <span className="text-xs text-slate-500">Code: {room.code}</span>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                copyRoomCode(room.code);
-                              }}
-                              className="text-xs text-[#7ED957] hover:text-[#6cc149]"
-                            >
-                              <Copy className="w-3 h-3" />
-                            </button>
-                          </div>
-                        )}
                       </div>
                     ))}
                   </div>
@@ -428,14 +315,10 @@ const ChatRoomsPage = () => {
                     <div className="p-4 border-b border-slate-200">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                          {activeRoom.code ? (
-                            <Lock className="w-5 h-5 text-slate-600" />
-                          ) : (
-                            <Globe className="w-5 h-5 text-slate-600" />
-                          )}
+                          <Globe className="w-5 h-5 text-slate-600" />
                           <div>
                             <h3 className="font-semibold text-slate-900">{activeRoom.name}</h3>
-                            <p className="text-sm text-slate-500">{activeRoom.participants} participants</p>
+                            <p className="text-sm text-slate-500">{activeRoom.memberCount ?? activeRoom._count?.members ?? 0} participants</p>
                           </div>
                         </div>
                         <button className="p-2 text-slate-400 hover:text-slate-600">
@@ -447,17 +330,25 @@ const ChatRoomsPage = () => {
                     {/* Messages */}
                     <div className="flex-1 p-4 overflow-y-auto">
                       <div className="space-y-4">
-                        {activeRoom.messages.map((msg) => (
+                        {roomMessages.map((msg) => (
                           <div key={msg.id} className="flex items-start gap-3">
                             <div className="w-8 h-8 bg-slate-200 rounded-full flex items-center justify-center">
-                              <User className="w-4 h-4 text-slate-500" />
+                              {msg.user.image ? (
+                                <img 
+                                  src={msg.user.image} 
+                                  alt={msg.user.name}
+                                  className="w-8 h-8 rounded-full object-cover"
+                                />
+                              ) : (
+                                <User className="w-4 h-4 text-slate-500" />
+                              )}
                             </div>
                             <div className="flex-1">
                               <div className="flex items-center gap-2 mb-1">
-                                <span className="font-medium text-slate-900">{msg.user}</span>
-                                <span className="text-xs text-slate-500">{msg.time}</span>
+                                <span className="font-medium text-slate-900">{msg.user.name}</span>
+                                <span className="text-xs text-slate-500">{formatDate(msg.createdAt)}</span>
                               </div>
-                              <p className="text-slate-700">{msg.message}</p>
+                              <p className="text-slate-700">{msg.content}</p>
                             </div>
                           </div>
                         ))}
@@ -471,13 +362,19 @@ const ChatRoomsPage = () => {
                           type="text"
                           placeholder="Type your message..."
                           value={message}
-                          onChange={(e) => setMessage(e.target.value)}
+                          onChange={(e) => {
+                            setMessage(e.target.value);
+                            if (activeRoom) {
+                              handleTyping(activeRoom.id);
+                            }
+                          }}
                           onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                           className="flex-1 px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-[#7ED957]/20 focus:border-[#7ED957] outline-none transition-colors"
                         />
                         <button
                           onClick={handleSendMessage}
-                          className="px-4 py-2 bg-[#7ED957] text-white rounded-lg hover:bg-[#6cc149] transition-colors"
+                          disabled={!isConnected}
+                          className="px-4 py-2 bg-[#7ED957] text-white rounded-lg hover:bg-[#6cc149] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           <Send className="w-4 h-4" />
                         </button>
@@ -495,122 +392,13 @@ const ChatRoomsPage = () => {
                 )}
               </div>
             </div>
-                     )}
-         </div>
-       </div>
+          )}
+        </div>
+      </div>
 
-       {/* Create Room Modal */}
-       {showCreateRoom && (
-         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-           <div className="bg-white rounded-2xl p-6 w-full max-w-md mx-4">
-             <div className="flex items-center justify-between mb-6">
-               <h3 className="text-xl font-semibold text-slate-900">Create New Room</h3>
-               <button
-                 onClick={() => setShowCreateRoom(false)}
-                 className="text-slate-400 hover:text-slate-600"
-               >
-                 <X className="w-5 h-5" />
-               </button>
-             </div>
+      {/* Room creation modal removed */}
+    </>
+  );
+};
 
-             <div className="space-y-4">
-               {/* Room Name */}
-               <div>
-                 <label className="block text-sm font-medium text-slate-700 mb-2">
-                   Room Name
-                 </label>
-                 <input
-                   type="text"
-                   placeholder="Enter room name..."
-                   value={newRoomData.name}
-                   onChange={(e) => setNewRoomData({...newRoomData, name: e.target.value})}
-                   className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-[#7ED957]/20 focus:border-[#7ED957] outline-none transition-colors"
-                 />
-               </div>
-
-               {/* Room Description */}
-               <div>
-                 <label className="block text-sm font-medium text-slate-700 mb-2">
-                   Description
-                 </label>
-                 <textarea
-                   placeholder="Describe what this room is about..."
-                   value={newRoomData.description}
-                   onChange={(e) => setNewRoomData({...newRoomData, description: e.target.value})}
-                   rows={3}
-                   className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-[#7ED957]/20 focus:border-[#7ED957] outline-none transition-colors resize-none"
-                 />
-               </div>
-
-               {/* Room Type */}
-               <div>
-                 <label className="block text-sm font-medium text-slate-700 mb-2">
-                   Room Type
-                 </label>
-                 <div className="flex gap-4">
-                   <label className="flex items-center gap-2">
-                     <input
-                       type="radio"
-                       checked={!newRoomData.isPrivate}
-                       onChange={() => setNewRoomData({...newRoomData, isPrivate: false})}
-                       className="text-[#7ED957] focus:ring-[#7ED957]"
-                     />
-                     <Globe className="w-4 h-4 text-slate-500" />
-                     <span className="text-sm text-slate-700">Public</span>
-                   </label>
-                   <label className="flex items-center gap-2">
-                     <input
-                       type="radio"
-                       checked={newRoomData.isPrivate}
-                       onChange={() => setNewRoomData({...newRoomData, isPrivate: true})}
-                       className="text-[#7ED957] focus:ring-[#7ED957]"
-                     />
-                     <Lock className="w-4 h-4 text-slate-500" />
-                     <span className="text-sm text-slate-700">Private</span>
-                   </label>
-                 </div>
-               </div>
-
-               {/* Category (for public rooms) */}
-               {!newRoomData.isPrivate && (
-                 <div>
-                   <label className="block text-sm font-medium text-slate-700 mb-2">
-                     Category
-                   </label>
-                   <select
-                     value={newRoomData.category}
-                     onChange={(e) => setNewRoomData({...newRoomData, category: e.target.value})}
-                     className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-[#7ED957]/20 focus:border-[#7ED957] outline-none transition-colors"
-                   >
-                     <option value="Frontend">Frontend</option>
-                     <option value="Backend">Backend</option>
-                     <option value="Programming">Programming</option>
-                   </select>
-                 </div>
-               )}
-
-               {/* Actions */}
-               <div className="flex gap-3 pt-4">
-                 <button
-                   onClick={() => setShowCreateRoom(false)}
-                   className="flex-1 px-4 py-2 border border-slate-200 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors"
-                 >
-                   Cancel
-                 </button>
-                 <button
-                   onClick={handleCreateRoom}
-                   disabled={!newRoomData.name.trim() || !newRoomData.description.trim()}
-                   className="flex-1 px-4 py-2 bg-[#7ED957] text-white rounded-lg hover:bg-[#6cc149] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                 >
-                   Create Room
-                 </button>
-               </div>
-             </div>
-           </div>
-         </div>
-       )}
-     </>
-   );
- };
-
-export default ChatRoomsPage; 
+export default ChatRoomsPage;

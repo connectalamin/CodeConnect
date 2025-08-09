@@ -3,9 +3,12 @@ import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { getCategories, createCategory, updateCategory, deleteCategory } from "../services/adminService";
+import { useAuth } from './useAuth';
 
 export const useCategoryManagement = (token) => {
   const queryClient = useQueryClient();
+  const { getToken } = useAuth();
+  const effectiveToken = token || getToken?.();
   const [newCategory, setNewCategory] = useState("");
   const [editingCategory, setEditingCategory] = useState(null);
   const [error, setError] = useState(null);
@@ -14,13 +17,13 @@ export const useCategoryManagement = (token) => {
 
   const { data: categories, isLoading, isError } = useQuery({
     queryKey: ['categories'],
-    queryFn: () => getCategories(token).catch(err => { throw err; }), // Ensure error is thrown
+    queryFn: () => getCategories(effectiveToken).catch(err => { throw err; }), // Ensure error is thrown
     retry: 1, // Limit retries
     onError: (err) => setError(err.message || 'Failed to fetch categories'),
   });
 
   const createMutation = useMutation({
-    mutationFn: ({ categoryData }) => createCategory(categoryData, token),
+    mutationFn: ({ categoryData }) => createCategory(categoryData, effectiveToken),
     onSuccess: () => {
       queryClient.invalidateQueries(['categories']);
       setNewCategory("");
@@ -31,7 +34,7 @@ export const useCategoryManagement = (token) => {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ categoryId, categoryData }) => updateCategory(categoryId, categoryData, token),
+    mutationFn: ({ categoryId, categoryData }) => updateCategory(categoryId, categoryData, effectiveToken),
     onSuccess: () => {
       queryClient.invalidateQueries(['categories']);
       setEditingCategory(null);
@@ -43,7 +46,7 @@ export const useCategoryManagement = (token) => {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: ({ categoryId }) => deleteCategory(categoryId, token),
+    mutationFn: ({ categoryId }) => deleteCategory(categoryId, effectiveToken),
     onSuccess: () => {
       queryClient.invalidateQueries(['categories']);
       toast.success('Category deleted successfully');
