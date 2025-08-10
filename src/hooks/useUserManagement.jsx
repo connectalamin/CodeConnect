@@ -8,12 +8,46 @@ export const useUserManagement = (token) => {
   const queryClient = useQueryClient();
   const [error, setError] = useState(null);
 
-  const { data: users, isLoading, isError } = useQuery({
-    queryKey: ['users'],
-    queryFn: () => getUsers(token).catch(err => { throw err; }), // Ensure error is thrown
-    retry: 1, // Limit retries
+  // Fetch only when token is present to avoid initial 403 race after redirect
+  const { data: users, isLoading, isError, status, refetch } = useQuery({
+    queryKey: ['users', !!token],
+    enabled: !!token, // don't run until token ready
+    staleTime: 30_000,
+    retry: 0, // avoid retry storm on auth failures
+    queryFn: async () => {
+      try {
+        const data = await getUsers(token);
+        return data;
+      } catch (err) {
+        // Normalize to object with message
+        if (typeof err === 'string') {
+          throw new Error(err);
+        }
+        if (!err.message && err.error) {
+          throw new Error(err.error);
+        }
+        throw err;
+      }
+    },
     onError: (err) => setError(err.message || 'Failed to fetch users'),
+    onSuccess: () => {
+      if (error) setError(null);
+    }
   });
+
+  // When token first appears (after login), ensure we refetch if query was idle
+  useEffect(() => {
+    if (token && status === 'idle') {
+      refetch();
+    }
+  }, [token, status, refetch]);
+
+  // If token changes (re-login), clear cached users & refetch
+  useEffect(() => {
+    if (token) {
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+    }
+  }, [token, queryClient]);
 
   const deleteMutation = useMutation({
     mutationFn: ({ userId }) => deleteUser(userId, token),
