@@ -2,16 +2,56 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/assets/CodeConnect-DyHu75CM.svg" />
+    <link rel="icon" type="image/svg+xml" href="/CodeConnect.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>CodeConnect</title>
-    <script type="module" crossorigin src="/assets/index-8oG02v-A.js"></script>
-    <link rel="modulepreload" crossorigin href="/assets/vendor-DtYsOvwE.js">
-    <link rel="modulepreload" crossorigin href="/assets/post-y4DDJvdn.js">
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="theme-color" content="#7ED957" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+    <script type="module" crossorigin src="/assets/index-DPRdGjzx.js"></script>
+    <link rel="modulepreload" crossorigin href="/assets/vendor-DOzNCXVT.js">
+    <link rel="modulepreload" crossorigin href="/assets/post-_DgKfm2Y.js">
     <link rel="stylesheet" crossorigin href="/assets/post-BEHUn5zE.css">
-    <link rel="stylesheet" crossorigin href="/assets/index-KO6PZ-D-.css">
+    <link rel="stylesheet" crossorigin href="/assets/index-B94ID3p6.css">
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root"></div>
+    <div id="pwa-install" style="position:fixed;inset:auto 0 1rem 0;display:none;justify-content:center;z-index:50;">
+      <div style="background:#1e293b;color:#fff;padding:.75rem 1rem;border-radius:1rem;display:flex;gap:.75rem;align-items:center;box-shadow:0 6px 20px -4px rgba(0,0,0,.3);font:500 14px system-ui">
+        <span>Add CodeConnect to your home screen?</span>
+        <button id="pwa-install-btn" style="background:#7ED957;color:#0f172a;font-weight:600;border:none;padding:.35rem .9rem;border-radius:.65rem;cursor:pointer">Install</button>
+        <button id="pwa-install-close" style="background:transparent;color:#fff;border:none;font-size:18px;line-height:1;cursor:pointer">×</button>
+      </div>
+    </div>
+    <script>
+      let deferredPrompt;
+      const bar = document.getElementById('pwa-install');
+      const installBtn = document.getElementById('pwa-install-btn');
+      const closeBtn = document.getElementById('pwa-install-close');
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        bar.style.display = 'flex';
+      });
+      installBtn?.addEventListener('click', async () => {
+        if (!deferredPrompt) return;
+        deferredPrompt.prompt();
+        const choice = await deferredPrompt.userChoice;
+        if (choice.outcome !== 'accepted') {
+          console.log('[PWA] Install dismissed');
+        }
+        deferredPrompt = null;
+        bar.style.display = 'none';
+      });
+      closeBtn?.addEventListener('click', () => {
+        bar.style.display = 'none';
+      });
+      window.addEventListener('appinstalled', () => {
+        console.log('[PWA] Installed');
+        bar.style.display = 'none';
+      });
+    </script>
   </body>
 </html>
