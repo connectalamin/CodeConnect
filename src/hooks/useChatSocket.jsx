@@ -10,7 +10,10 @@ export const useChatSocket = () => {
   const [currentRoom, setCurrentRoom] = useState(null);
   const [messages, setMessages] = useState([]);
   const [onlineUsers, setOnlineUsers] = useState(new Set());
+  // Global typing users (legacy) + per-room typing map
   const [typingUsers, setTypingUsers] = useState(new Set());
+  const [typingByRoom, setTypingByRoom] = useState({}); // {roomId: Set<userId>}
+  const [unreadCounts, setUnreadCounts] = useState({}); // {roomId: number}
   const [connectionError, setConnectionError] = useState(null);
   const { getToken, user } = useAuth();
   const socketRef = useRef(null);
@@ -56,10 +59,26 @@ export const useChatSocket = () => {
     newSocket.on('room-joined', (data) => {
       console.log('Joined room:', data);
       setCurrentRoom(data.roomId);
+      // Mark read on join
+      setUnreadCounts(prev => {
+        if (!prev[data.roomId]) return prev;
+        const next = { ...prev, [data.roomId]: 0 };
+        localStorage.setItem('chat_unreads', JSON.stringify(next));
+        return next;
+      });
     });
 
     newSocket.on('new-message', (message) => {
       setMessages(prev => [...prev, message]);
+      // If message for room not currently open, increment unread
+      setUnreadCounts(prev => {
+        if (message.roomId && message.roomId !== currentRoom) {
+          const next = { ...prev, [message.roomId]: (prev[message.roomId] || 0) + 1 };
+          localStorage.setItem('chat_unreads', JSON.stringify(next));
+          return next;
+        }
+        return prev;
+      });
     });
 
     newSocket.on('user-online', (data) => {
@@ -76,7 +95,12 @@ export const useChatSocket = () => {
 
     newSocket.on('user-typing', (data) => {
       if (data.userId !== user?.id) {
-        setTypingUsers(prev => new Set([...prev, data.userId]));
+        setTypingUsers(prev => new Set([...prev, data.userId])); // legacy
+        setTypingByRoom(prev => {
+          const roomSet = new Set(prev[data.roomId] || []);
+            roomSet.add(data.userId);
+          return { ...prev, [data.roomId]: roomSet };
+        });
       }
     });
 
@@ -85,6 +109,12 @@ export const useChatSocket = () => {
         const newSet = new Set(prev);
         newSet.delete(data.userId);
         return newSet;
+      });
+      setTypingByRoom(prev => {
+        if (!prev[data.roomId]) return prev;
+        const roomSet = new Set(prev[data.roomId]);
+        roomSet.delete(data.userId);
+        return { ...prev, [data.roomId]: roomSet };
       });
     });
 
@@ -174,12 +204,42 @@ export const useChatSocket = () => {
 
       const data = await response.json();
       setMessages(data.messages || []);
+      // Reset unread for this room because user explicitly fetched messages
+      setUnreadCounts(prev => {
+        if (!prev[roomId]) return prev;
+        const next = { ...prev, [roomId]: 0 };
+        localStorage.setItem('chat_unreads', JSON.stringify(next));
+        return next;
+      });
       return data;
     } catch (error) {
       console.error('Error fetching room messages:', error);
       throw error;
     }
   }, [getToken]);
+
+  // Mark room read (exposed to UI)
+  const markRoomRead = useCallback((roomId) => {
+    setUnreadCounts(prev => {
+      if (!prev[roomId]) return prev;
+      const next = { ...prev, [roomId]: 0 };
+      localStorage.setItem('chat_unreads', JSON.stringify(next));
+      return next;
+    });
+  }, []);
+
+  // Load unread counts from localStorage on mount
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('chat_unreads');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (parsed && typeof parsed === 'object') setUnreadCounts(parsed);
+      }
+    } catch (e) {
+      console.warn('Failed to parse stored unread counts');
+    }
+  }, []);
 
   // Connect on mount
   useEffect(() => {
@@ -216,6 +276,9 @@ export const useChatSocket = () => {
     sendMessage,
     handleTyping,
     fetchRoomMessages,
-    setMessages
+  setMessages,
+  unreadCounts,
+  markRoomRead,
+  typingByRoom
   };
 };

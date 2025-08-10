@@ -1,24 +1,18 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAuth } from "../hooks/useAuth";
 import { useChatRooms } from "../hooks/useChatRooms";
 import { useChatSocket } from "../hooks/useChatSocket";
 import Navbar from "../components/Navbar";
 import { HashLoader } from "react-spinners";
-import { 
-  MessageCircle, 
-  Users, 
-  Globe, 
-  Search, 
+import {
+  MessageCircle,
+  Users,
+  Globe,
+  Search,
   Filter,
-  Clock,
-  Hash,
-  Copy,
-  Eye,
-  EyeOff,
-  Settings,
   User,
   Send,
-  MoreVertical
+  // MoreVertical (removed)
 } from "lucide-react";
 
 const ChatRoomsPage = () => {
@@ -36,15 +30,18 @@ const ChatRoomsPage = () => {
   const {
     isConnected,
     currentRoom,
-    messages,
+  messages,
     onlineUsers,
-    typingUsers,
+  typingUsers,
     joinRoom: socketJoinRoom,
     leaveRoom: socketLeaveRoom,
     sendMessage: socketSendMessage,
     handleTyping,
-    fetchRoomMessages,
-    setMessages
+  fetchRoomMessages,
+  setMessages,
+  unreadCounts,
+  markRoomRead,
+  typingByRoom
   } = useChatSocket();
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -53,6 +50,10 @@ const ChatRoomsPage = () => {
   const [selectedFilter, setSelectedFilter] = useState('all');
   const [activeRoom, setActiveRoom] = useState(null);
   const [message, setMessage] = useState('');
+  // Pagination state for room list (4 per page)
+  const [roomsPage, setRoomsPage] = useState(1);
+  const pageSize = 4;
+  const messagesEndRef = useRef(null);
 
   // Categories for filtering (public rooms only)
   const categories = [
@@ -96,6 +97,11 @@ const ChatRoomsPage = () => {
     return allRooms;
   };
 
+  // Derive paginated rooms
+  const filteredRooms = getFilteredRooms();
+  const totalRoomPages = Math.max(1, Math.ceil(filteredRooms.length / pageSize));
+  const paginatedRooms = filteredRooms.slice((roomsPage - 1) * pageSize, roomsPage * pageSize);
+
   const handleJoinRoom = async (room) => {
     try {
       setActiveRoom(room);
@@ -104,6 +110,7 @@ const ChatRoomsPage = () => {
       // Fetch room messages
       const roomData = await fetchRoomMessages(room.id);
       setRoomMessages(roomData.messages || []);
+      markRoomRead(room.id);
     } catch (error) {
       console.error('Error joining room:', error);
     }
@@ -140,15 +147,39 @@ const ChatRoomsPage = () => {
     };
   }, [searchQuery, selectedFilter]);
 
+  // Reset page when filters/search change
+  useEffect(() => {
+    setRoomsPage(1);
+  }, [searchQuery, selectedFilter, publicRooms.length]);
+
   // Update room messages when socket messages change
   useEffect(() => {
     if (activeRoom && messages.length > 0) {
       const roomSpecificMessages = messages.filter(msg => msg.roomId === activeRoom.id);
       if (roomSpecificMessages.length > 0) {
-        setRoomMessages(prev => [...prev, ...roomSpecificMessages]);
+        setRoomMessages(prev => {
+          const combined = [...prev, ...roomSpecificMessages];
+          // de-dupe by id
+          const seen = new Set();
+          const result = [];
+          for (const m of combined) {
+            if (!m.id || !seen.has(m.id)) {
+              if (m.id) seen.add(m.id);
+              result.push(m);
+            }
+          }
+          return result;
+        });
       }
     }
   }, [messages, activeRoom]);
+
+  // Auto-scroll to bottom on new messages
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [roomMessages, activeRoom]);
 
   if (!isAuthenticated()) {
     return (
@@ -273,10 +304,10 @@ const ChatRoomsPage = () => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Room List */}
               <div className="lg:col-span-1">
-                <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col max-h-[75vh]">
                   <h3 className="text-lg font-semibold text-slate-900 mb-4">Available Rooms</h3>
-                  <div className="space-y-3">
-                    {getFilteredRooms().map((room) => (
+                  <div className="space-y-3 overflow-y-auto pr-1 flex-1">
+                    {paginatedRooms.map((room) => (
                       <div
                         key={room.id}
                         onClick={() => handleJoinRoom(room)}
@@ -291,7 +322,12 @@ const ChatRoomsPage = () => {
                             <Globe className="w-4 h-4 text-slate-500" />
                             <h4 className="font-semibold text-slate-900">{room.name}</h4>
                           </div>
-                          <div className="flex items-center gap-1 text-xs text-slate-500">
+                          <div className="flex items-center gap-2 text-xs text-slate-500">
+                            {unreadCounts?.[room.id] > 0 && (
+                              <span className="px-2 py-0.5 bg-red-500 text-white rounded-full text-[10px] font-medium">
+                                {unreadCounts[room.id] > 99 ? '99+' : unreadCounts[room.id]}
+                              </span>
+                            )}
                             <Users className="w-3 h-3" />
                             <span>{room.memberCount ?? room._count?.members ?? 0}</span>
                           </div>
@@ -301,16 +337,37 @@ const ChatRoomsPage = () => {
                           <span>{room.messageCount ?? 0} messages</span>
                           <span>{formatDate(room.createdAt)}</span>
                         </div>
+                        {typingByRoom?.[room.id] && typingByRoom[room.id].size > 0 && (
+                          <div className="mt-2 text-[10px] text-[#7ED957] truncate">
+                            {typingByRoom[room.id].size === 1 ? 'Someone is typing…' : `${typingByRoom[room.id].size} people typing…`}
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
+                  {/* Pagination Controls */}
+                  {totalRoomPages > 1 && (
+                    <div className="flex items-center justify-between pt-4 mt-2 border-t border-slate-200 text-sm">
+                      <button
+                        onClick={() => setRoomsPage(p => Math.max(1, p - 1))}
+                        disabled={roomsPage === 1}
+                        className="px-3 py-1 rounded-md border border-slate-200 disabled:opacity-40 hover:bg-slate-50"
+                      >Prev</button>
+                      <span className="text-slate-600">Page {roomsPage} / {totalRoomPages}</span>
+                      <button
+                        onClick={() => setRoomsPage(p => Math.min(totalRoomPages, p + 1))}
+                        disabled={roomsPage === totalRoomPages}
+                        className="px-3 py-1 rounded-md border border-slate-200 disabled:opacity-40 hover:bg-slate-50"
+                      >Next</button>
+                    </div>
+                  )}
                 </div>
               </div>
 
               {/* Chat Area */}
               <div className="lg:col-span-2">
                 {activeRoom ? (
-                  <div className="bg-white rounded-2xl shadow-sm border border-slate-200 h-[600px] flex flex-col">
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col" style={{height: '70vh'}}>
                     {/* Chat Header */}
                     <div className="p-4 border-b border-slate-200">
                       <div className="flex items-center justify-between">
@@ -321,9 +378,7 @@ const ChatRoomsPage = () => {
                             <p className="text-sm text-slate-500">{activeRoom.memberCount ?? activeRoom._count?.members ?? 0} participants</p>
                           </div>
                         </div>
-                        <button className="p-2 text-slate-400 hover:text-slate-600">
-                          <MoreVertical className="w-4 h-4" />
-                        </button>
+        {/* Three dots menu removed */}
                       </div>
                     </div>
 
@@ -352,6 +407,12 @@ const ChatRoomsPage = () => {
                             </div>
                           </div>
                         ))}
+                        <div ref={messagesEndRef} />
+                        {typingByRoom?.[activeRoom.id] && typingByRoom[activeRoom.id].size > 0 && (
+                          <div className="text-xs text-[#7ED957] flex items-center gap-1">
+                            <span className="animate-pulse">{[...typingByRoom[activeRoom.id]].length === 1 ? 'Someone is typing…' : 'Multiple people typing…'}</span>
+                          </div>
+                        )}
                       </div>
                     </div>
 
