@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-// Temporary hardcoded URL to fix production issue
+// Temporary hardcoded URL to fix production issue - Updated for Vercel deployment
 const API_URL = 'https://codeconnect-backend-ftku.onrender.com';
 
 // User Management Functions
