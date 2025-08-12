@@ -2,6 +2,12 @@ import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_SERVER_DEFAULT_API ; 
 
+// Debug environment variables
+console.log('🔧 Environment check:');
+console.log('- VITE_SERVER_DEFAULT_API:', import.meta.env.VITE_SERVER_DEFAULT_API);
+console.log('- API_URL:', API_URL);
+console.log('- All env vars:', import.meta.env); 
+
 const authService = {
   register: async (userData) => {
     return axios.post(`${API_URL}/auth/signup`, userData);
@@ -13,7 +19,10 @@ const authService = {
 
   // Email verification methods
   verifyEmail: async (token) => {
-    return axios.get(`${API_URL}/auth/verify-email?token=${token}`);
+    const url = `${API_URL}/auth/verify-email?token=${token}`;
+    console.log('🌐 Making API call to:', url);
+    console.log('🔑 API_URL is:', API_URL);
+    return axios.get(url);
   },
 
   resendVerificationEmail: async (email) => {
