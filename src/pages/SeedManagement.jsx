@@ -77,18 +77,7 @@ const SeedManagement = () => {
         </div>
       </div>
 
-      {/* Warning Card */}
-      <div className="bg-orange-50 border border-orange-200 rounded-xl p-4">
-        <div className="flex items-start space-x-3">
-          <AlertTriangle className="w-5 h-5 text-orange-500 mt-0.5 flex-shrink-0" />
-          <div>
-            <h3 className="font-semibold text-orange-800 mb-1">Important Notice</h3>
-            <p className="text-sm text-orange-700">
-              These actions will affect your production database. Use with caution and only when necessary.
-            </p>
-          </div>
-        </div>
-      </div>
+
 
       {/* Action Cards */}
       <div className="grid md:grid-cols-2 gap-6">
@@ -108,10 +97,10 @@ const SeedManagement = () => {
             <div className="text-sm text-slate-600">
               <p className="font-medium mb-2">This will add:</p>
               <ul className="space-y-1 text-xs">
-                <li>• 8 sample users (regular users only)</li>
-                <li>• 8 categories</li>
-                <li>• 8 sample posts with comments</li>
-                <li>• Votes and interactions</li>
+                <li>• 20 Bangladeshi sample users (regular users only)</li>
+                <li>• Students from BUET, DU, Comilla University, etc.</li>
+                <li>• 58+ sample posts with realistic programming content</li>
+                <li>• 150+ comments and interactions</li>
                 <li>• Preserves your existing admin users</li>
               </ul>
             </div>
@@ -180,15 +169,7 @@ const SeedManagement = () => {
         </div>
       </div>
 
-      {/* Instructions */}
-      <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-        <h3 className="font-semibold text-blue-800 mb-2">How to use:</h3>
-        <ol className="text-sm text-blue-700 space-y-1">
-          <li>1. <strong>Seed Database:</strong> Use this to populate your database with sample data for testing or demonstration</li>
-          <li>2. <strong>Clear Database:</strong> Use this to reset your database to a clean state</li>
-          <li>3. Both actions will automatically refresh the page after completion</li>
-        </ol>
-      </div>
+
     </div>
   );
 };
