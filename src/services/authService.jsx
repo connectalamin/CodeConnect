@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_SERVER_DEFAULT_API ; 
+const API_URL = import.meta.env.VITE_SERVER_DEFAULT_API || 'https://codeconnect-backend-ftku.onrender.com';
 
 // Debug environment variables
 console.log('🔧 Environment check:');
