@@ -7,7 +7,6 @@ import adminService from '../services/adminService';
 const SeedManagement = () => {
   const { token } = useAuth();
   const [loading, setLoading] = useState(false);
-  const [clearLoading, setClearLoading] = useState(false);
 
   const handleSeedDatabase = async () => {
     if (!token) {
@@ -33,36 +32,7 @@ const SeedManagement = () => {
     }
   };
 
-  const handleClearDatabase = async () => {
-    if (!token) {
-      toast.error('Authentication required');
-      return;
-    }
 
-    const confirmed = window.confirm(
-      '⚠️ WARNING: This will delete ALL data from the database!\n\n' +
-      'This action cannot be undone. Are you sure you want to continue?'
-    );
-
-    if (!confirmed) return;
-
-    setClearLoading(true);
-    try {
-      const response = await adminService.clearDatabase(token);
-      toast.success('Database cleared successfully!');
-      console.log('Clear response:', response.data);
-      
-      // Refresh the page after successful clearing
-      setTimeout(() => {
-        window.location.reload();
-      }, 2000);
-    } catch (error) {
-      console.error('Clear error:', error);
-      toast.error(error.response?.data?.error || 'Failed to clear database');
-    } finally {
-      setClearLoading(false);
-    }
-  };
 
   return (
     <div className="p-6 space-y-6">
@@ -80,7 +50,7 @@ const SeedManagement = () => {
 
 
       {/* Action Cards */}
-      <div className="grid md:grid-cols-2 gap-6">
+      <div className="max-w-md mx-auto">
         {/* Seed Database Card */}
         <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
           <div className="flex items-center space-x-3 mb-4">
@@ -125,48 +95,7 @@ const SeedManagement = () => {
           </button>
         </div>
 
-        {/* Clear Database Card */}
-        <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
-          <div className="flex items-center space-x-3 mb-4">
-            <div className="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center">
-              <Trash2 className="w-4 h-4 text-red-600" />
-            </div>
-            <div>
-              <h3 className="font-semibold text-slate-900">Clear Database</h3>
-              <p className="text-sm text-slate-600">Remove all data from database</p>
-            </div>
-          </div>
 
-          <div className="space-y-3 mb-6">
-            <div className="text-sm text-red-600">
-              <p className="font-medium mb-2">⚠️ This will delete:</p>
-              <ul className="space-y-1 text-xs">
-                <li>• All users and their data</li>
-                <li>• All posts and comments</li>
-                <li>• All categories</li>
-                <li>• All votes and interactions</li>
-              </ul>
-            </div>
-          </div>
-
-          <button
-            onClick={handleClearDatabase}
-            disabled={clearLoading}
-            className="w-full bg-red-600 text-white font-medium py-3 px-4 rounded-lg hover:bg-red-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
-          >
-            {clearLoading ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin" />
-                <span>Clearing Database...</span>
-              </>
-            ) : (
-              <>
-                <Trash2 className="w-4 h-4" />
-                <span>Clear Database</span>
-              </>
-            )}
-          </button>
-        </div>
       </div>
 
 
