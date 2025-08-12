@@ -1,13 +1,13 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_BASE_URL = import.meta.env.VITE_SERVER_DEFAULT_API || 'http://localhost:5000';
 
 class LeaderboardService {
   // Get main leaderboard
   async getLeaderboard(params = {}) {
     try {
       const { limit = 50, offset = 0, timeframe = 'all' } = params;
-      const response = await axios.get(`${API_BASE_URL}/leaderboard`, {
+      const response = await axios.get(`${API_BASE_URL}/api/leaderboard`, {
         params: { limit, offset, timeframe }
       });
       return response.data;
@@ -21,7 +21,7 @@ class LeaderboardService {
   async getLeaderboardByMetric(params = {}) {
     try {
       const { metric = 'karma', limit = 20, offset = 0 } = params;
-      const response = await axios.get(`${API_BASE_URL}/leaderboard/by-metric`, {
+      const response = await axios.get(`${API_BASE_URL}/api/leaderboard/by-metric`, {
         params: { metric, limit, offset }
       });
       return response.data;
@@ -34,7 +34,7 @@ class LeaderboardService {
   // Get leaderboard stats
   async getLeaderboardStats() {
     try {
-      const response = await axios.get(`${API_BASE_URL}/leaderboard/stats`);
+      const response = await axios.get(`${API_BASE_URL}/api/leaderboard/stats`);
       return response.data;
     } catch (error) {
       console.error('Error fetching leaderboard stats:', error);
@@ -45,7 +45,7 @@ class LeaderboardService {
   // Get specific user's position
   async getUserPosition(userId, token) {
     try {
-      const response = await axios.get(`${API_BASE_URL}/leaderboard/user/${userId}`, {
+      const response = await axios.get(`${API_BASE_URL}/api/leaderboard/user/${userId}`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -60,7 +60,7 @@ class LeaderboardService {
   // Get current user's position
   async getMyPosition(token) {
     try {
-      const response = await axios.get(`${API_BASE_URL}/leaderboard/me`, {
+      const response = await axios.get(`${API_BASE_URL}/api/leaderboard/me`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
