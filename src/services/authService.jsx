@@ -13,7 +13,7 @@ const authService = {
 
   // Email verification methods
   verifyEmail: async (token) => {
-    return axios.get(`${API_URL}/auth/verify-email/${token}`);
+    return axios.get(`${API_URL}/auth/verify-email?token=${token}`);
   },
 
   resendVerificationEmail: async (email) => {
