@@ -72,8 +72,8 @@ const SeedManagement = () => {
           <Database className="w-6 h-6 text-white" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Database Seed Management</h1>
-          <p className="text-slate-600">Manage your database with sample data</p>
+          <h1 className="text-2xl font-bold text-slate-900">Database Sample Data Management</h1>
+          <p className="text-slate-600">Add sample data while preserving existing users</p>
         </div>
       </div>
 
@@ -99,19 +99,20 @@ const SeedManagement = () => {
               <CheckCircle className="w-4 h-4 text-green-600" />
             </div>
             <div>
-              <h3 className="font-semibold text-slate-900">Seed Database</h3>
-              <p className="text-sm text-slate-600">Add sample data to your database</p>
+              <h3 className="font-semibold text-slate-900">Add Sample Data</h3>
+              <p className="text-sm text-slate-600">Add sample data (preserves existing users)</p>
             </div>
           </div>
 
           <div className="space-y-3 mb-6">
             <div className="text-sm text-slate-600">
-              <p className="font-medium mb-2">This will create:</p>
+              <p className="font-medium mb-2">This will add:</p>
               <ul className="space-y-1 text-xs">
-                <li>• 8 sample users (including 1 admin)</li>
+                <li>• 8 sample users (regular users only)</li>
                 <li>• 8 categories</li>
                 <li>• 8 sample posts with comments</li>
                 <li>• Votes and interactions</li>
+                <li>• Preserves your existing admin users</li>
               </ul>
             </div>
           </div>
@@ -124,12 +125,12 @@ const SeedManagement = () => {
             {loading ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
-                <span>Seeding Database...</span>
+                <span>Adding Sample Data...</span>
               </>
             ) : (
               <>
                 <RefreshCw className="w-4 h-4" />
-                <span>Seed Database</span>
+                <span>Add Sample Data</span>
               </>
             )}
           </button>
