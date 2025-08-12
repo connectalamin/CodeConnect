@@ -12,7 +12,8 @@ import {
   LogOut,
   ChevronRight,
   Activity,
-  TrendingUp
+  TrendingUp,
+  Database
 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 
@@ -35,6 +36,8 @@ const Admin = () => {
       setActivePage('users');
     } else if (location.pathname.includes('/admin/categories')) {
       setActivePage('categories');
+    } else if (location.pathname.includes('/admin/seed')) {
+      setActivePage('seed');
     }
   }, [location, navigate]);
 
@@ -55,6 +58,12 @@ const Admin = () => {
       path: '/admin/chat-rooms',
       label: 'Chat Rooms',
       icon: <Shield className="w-4 h-4" />,
+      count: undefined
+    },
+    {
+      path: '/admin/seed',
+      label: 'Database Seed',
+      icon: <Database className="w-4 h-4" />,
       count: undefined
     },
   ];

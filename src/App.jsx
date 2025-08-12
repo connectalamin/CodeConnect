@@ -38,6 +38,7 @@ import SavedPostsPage from "./pages/SavedPostsPage";
 import ChatRoomsPage from "./pages/ChatRoomsPage";
 import FAQ from "./pages/FAQ";
 import ChatRoomManagement from "./pages/ChatRoomManagement";
+import SeedManagement from "./pages/SeedManagement";
 
 function App() {
   const [authReady, setAuthReady] = useState(false);
@@ -227,6 +228,7 @@ function App() {
               <Route path="users" element={<UserManagement />} />
               <Route path="categories" element={<CategoryManagement />} />
               <Route path="chat-rooms" element={<ChatRoomManagement />} />
+              <Route path="seed" element={<SeedManagement />} />
             </Route>
             <Route
               path="/post/:postId"
