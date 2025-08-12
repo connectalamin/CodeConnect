@@ -1,11 +1,12 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_SERVER_DEFAULT_API || 'https://codeconnect-backend-ftku.onrender.com';
+// Temporary hardcoded URL to fix production issue
+const API_URL = 'https://codeconnect-backend-ftku.onrender.com';
 
 // Debug environment variables
 console.log('🔧 Environment check:');
 console.log('- VITE_SERVER_DEFAULT_API:', import.meta.env.VITE_SERVER_DEFAULT_API);
-console.log('- API_URL:', API_URL);
+console.log('- API_URL (hardcoded):', API_URL);
 console.log('- All env vars:', import.meta.env); 
 
 const authService = {

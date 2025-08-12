@@ -22,18 +22,14 @@ const VerifyEmail = () => {
       }
 
       try {
-        console.log('🔍 About to call verifyEmail with token:', token);
         const response = await authService.verifyEmail(token);
-        console.log('✅ Verification response:', response);
         setSuccess(true);
         toast.success('Email verified successfully! You can now log in to your account.');
       } catch (error) {
-        console.error('❌ Verification error:', error);
+        console.error('Verification error:', error);
         if (error.response) {
-          console.log('Error response:', error.response);
           setError(error.response.data.error || 'Verification failed');
         } else {
-          console.log('Network error:', error.message);
           setError('Network error. Please try again.');
         }
         toast.error('Email verification failed. Please try again.');
