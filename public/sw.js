@@ -1,5 +1,5 @@
 /* Basic Service Worker for CodeConnect */
-const CACHE_VERSION = 'v2';
+const CACHE_VERSION = 'v4';
 const APP_SHELL = [
   '/',
   '/index.html',
@@ -29,7 +29,13 @@ self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
-  if (url.pathname.startsWith('/api/')) {
+  // Skip caching for unsupported schemes
+  if (!url.protocol.startsWith('http')) {
+    return;
+  }
+
+  // Handle external API calls (different origin) or API/auth routes
+  if (url.origin !== location.origin || url.pathname.startsWith('/api/') || url.pathname.startsWith('/auth/')) {
     event.respondWith(
       fetch(request).catch(() => caches.match(request))
     );
@@ -42,7 +48,12 @@ self.addEventListener('fetch', (event) => {
       fetch(request)
         .then(resp => {
           const copy = resp.clone();
-          caches.open(CACHE_VERSION).then(cache => cache.put(request, copy));
+          caches.open(CACHE_VERSION).then(cache => {
+            // Only cache http/https requests
+            if (request.url.startsWith('http')) {
+              cache.put(request, copy).catch(console.warn);
+            }
+          });
           return resp;
         })
         .catch(() => caches.match('/offline.html'))
@@ -55,9 +66,11 @@ self.addEventListener('fetch', (event) => {
       if (cached) return cached;
       return fetch(request).then(resp => {
         // Opportunistically cache static assets (js/css/png/svg)
-        if (['style', 'script', 'image'].includes(request.destination)) {
+        if (['style', 'script', 'image'].includes(request.destination) && request.url.startsWith('http')) {
           const copy = resp.clone();
-            caches.open(CACHE_VERSION).then(cache => cache.put(request, copy));
+          caches.open(CACHE_VERSION).then(cache => {
+            cache.put(request, copy).catch(console.warn);
+          });
         }
         return resp;
       }).catch(() => {
